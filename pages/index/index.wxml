@@ -1,6 +1,54 @@
+<!-- index.wxml -->
 <view class="container">
-  <canvas canvas-id="chinaMap" class="map-canvas" bindtap="onCanvasTap"></canvas>
+  <view class="header">
+    <text class="title">我的旅行足迹</text>
+    <text class="subtitle">记录你去过的每个地方</text>
+  </view>
+  
+  <view class="map-container">
+    <ec-canvas id="map-canvas" canvas-id="map-canvas" ec="{{ ec }}"></ec-canvas>
+  </view>
+  
   <view class="stats">
-    已点亮 {{visitedProvinces.length}} / {{totalProvinces}} 个省份
+    <view class="stat-item">
+      <text class="stat-number">{{ visitedCount }}</text>
+      <text class="stat-label">已到访</text>
+    </view>
+    <view class="stat-item">
+      <text class="stat-number">{{ wishCount }}</text>
+      <text class="stat-label">想去</text>
+    </view>
+    <view class="stat-item">
+      <text class="stat-number">{{ totalProvinces }}</text>
+      <text class="stat-label">总计</text>
+    </view>
+  </view>
+  
+  <view class="actions">
+    <button class="btn" bindtap="addFootprint">添加足迹</button>
+    <button class="btn secondary" bindtap="viewDetails">查看详情</button>
+  </view>
+  
+  <!-- 添加足迹的模态框 -->
+  <view class="modal" wx:if="{{ showModal }}">
+    <view class="modal-content">
+      <view class="modal-header">
+        <text class="modal-title">添加旅行足迹</text>
+        <text class="close" bindtap="closeModal">×</text>
+      </view>
+      <view class="modal-body">
+        <picker mode="selector" range="{{ provinces }}" value="{{ provinceIndex }}" bindchange="onProvinceChange">
+          <view class="picker">选择省份: {{ selectedProvince }}</view>
+        </picker>
+        <picker mode="date" value="{{ travelDate }}" bindchange="onDateChange">
+          <view class="picker">旅行日期: {{ travelDate }}</view>
+        </picker>
+        <textarea class="notes" placeholder="添加备注..." value="{{ notes }}" bindinput="onNotesChange"></textarea>
+      </view>
+      <view class="modal-footer">
+        <button class="btn" bindtap="saveFootprint">保存</button>
+        <button class="btn secondary" bindtap="closeModal">取消</button>
+      </view>
+    </view>
   </view>
 </view>

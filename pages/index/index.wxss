@@ -1,22 +1,147 @@
+/* index.wxss */
 .container {
-  width: 100%;
+  display: flex;
+  flex-direction: column;
   height: 100vh;
-  position: relative;
-  background: #f7f7f7;
+  background-color: #f5f5f5;
 }
 
-.map-canvas {
+.header {
+  padding: 20rpx;
+  text-align: center;
+  background-color: #fff;
+  box-shadow: 0 2rpx 10rpx rgba(0,0,0,0.1);
+}
+
+.title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+  display: block;
+}
+
+.subtitle {
+  font-size: 24rpx;
+  color: #666;
+  display: block;
+  margin-top: 10rpx;
+}
+
+.map-container {
+  flex: 1;
   width: 100%;
-  height: 100%;
+  margin: 20rpx 0;
 }
 
 .stats {
-  position: absolute;
-  bottom: 30rpx;
-  right: 30rpx;
-  background: rgba(0,0,0,0.6);
-  color: #fff;
-  padding: 10rpx 20rpx;
+  display: flex;
+  justify-content: space-around;
+  padding: 20rpx;
+  background-color: #fff;
+  margin: 0 20rpx;
+  border-radius: 10rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0,0,0,0.1);
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-number {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #ff6b6b;
+}
+
+.stat-label {
+  font-size: 24rpx;
+  color: #666;
+  margin-top: 10rpx;
+}
+
+.actions {
+  display: flex;
+  padding: 20rpx;
+  gap: 20rpx;
+}
+
+.btn {
+  flex: 1;
+  background-color: #ff6b6b;
+  color: white;
+  border: none;
+  border-radius: 50rpx;
+  padding: 20rpx;
+  font-size: 28rpx;
+}
+
+.btn.secondary {
+  background-color: #4dabf7;
+}
+
+/* 模态框样式 */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  width: 80%;
+  background-color: white;
   border-radius: 20rpx;
-  font-size: 26rpx;
+  overflow: hidden;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30rpx;
+  border-bottom: 1rpx solid #eee;
+}
+
+.modal-title {
+  font-size: 32rpx;
+  font-weight: bold;
+}
+
+.close {
+  font-size: 40rpx;
+  color: #999;
+}
+
+.modal-body {
+  padding: 30rpx;
+}
+
+.picker {
+  padding: 20rpx;
+  border: 1rpx solid #ddd;
+  border-radius: 10rpx;
+  margin-bottom: 20rpx;
+}
+
+.notes {
+  width: 100%;
+  height: 150rpx;
+  border: 1rpx solid #ddd;
+  border-radius: 10rpx;
+  padding: 20rpx;
+  box-sizing: border-box;
+}
+
+.modal-footer {
+  display: flex;
+  padding: 30rpx;
+  gap: 20rpx;
 }

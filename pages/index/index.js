@@ -1,178 +1,265 @@
-// pages/index/index.js
-const geojson = require('../../data/china.js') // 你的完整 GeoJSON
+// index.js
+import * as echarts from '../../ec-canvas/echarts';
+const chinaGeoJSON = require('../../data/china.js');
 
 Page({
   data: {
-    visitedProvinces: wx.getStorageSync('visitedProvinces') || [],
-    totalProvinces: 0,
-    mapBounds: null,
-    scale: 1,
-    offsetX: 0,
-    offsetY: 0,
+    ec: {
+      lazyLoad: true
+    },
+    visitedCount: 0,
+    wishCount: 0,
+    totalProvinces: 34,
+    showModal: false,
+    provinces: [],
+    provinceIndex: 0,
+    selectedProvince: '',
+    travelDate: '2023-01-01',
+    notes: '',
+    footprints: [],
+    chart: null
   },
 
-  onReady() {
-    this.calculateBounds()
-    this.drawChinaMap()
+  onLoad: function() {
+    // 初始化省份列表
+    const provinces = chinaGeoJSON.features.map(feature => feature.properties.name);
+    this.setData({
+      provinces,
+      selectedProvince: provinces[0]
+    });
+    
+    // 初始化足迹数据
+    this.initFootprints();
+    
+    // 初始化图表
+    this.initChart();
   },
 
-  // 计算地图边界和缩放参数
-  calculateBounds() {
-    const width = wx.getSystemInfoSync().windowWidth
-    const height = wx.getSystemInfoSync().windowHeight
-    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity
-
-    geojson.features.forEach(f => {
-      let rings = []
-      if(f.geometry.type === 'Polygon') rings = f.geometry.coordinates
-      else if(f.geometry.type === 'MultiPolygon') rings = f.geometry.coordinates.flat()
-
-      rings.forEach(ring => {
-        ring.forEach(p => {
-          minX = Math.min(minX, p[0])
-          maxX = Math.max(maxX, p[0])
-          minY = Math.min(minY, p[1])
-          maxY = Math.max(maxY, p[1])
-        })
-      })
-    })
-
-    const scaleX = width / (maxX - minX)
-    const scaleY = height / (maxY - minY)
-    const scale = Math.min(scaleX, scaleY) * 0.9 // 留边
-    const offsetX = (width - (maxX - minX) * scale) / 2
-    const offsetY = (height - (maxY - minY) * scale) / 2
-
-    this.setData({ mapBounds: { minX, maxX, minY, maxY }, scale, offsetX, offsetY })
+  initFootprints: function() {
+    // 从本地存储加载足迹数据
+    const footprints = wx.getStorageSync('footprints') || [];
+    this.setData({ footprints });
+    
+    // 计算统计数据
+    this.calcStats();
   },
 
-  // 地理坐标 -> canvas 坐标
-  mapX(x) {
-    return (x - this.data.mapBounds.minX) * this.data.scale + this.data.offsetX
+  calcStats: function() {
+    const visited = this.data.footprints.filter(f => f.type === 'visited').length;
+    const wish = this.data.footprints.filter(f => f.type === 'wish').length;
+    
+    this.setData({
+      visitedCount: visited,
+      wishCount: wish
+    });
   },
-  mapY(y) {
-    return (this.data.mapBounds.maxY - y) * this.data.scale + this.data.offsetY
-  },
 
-  drawChinaMap() {
-    const ctx = wx.createCanvasContext('chinaMap')
-    const visited = new Set(this.data.visitedProvinces)
-    const width = wx.getSystemInfoSync().windowWidth
-    const height = wx.getSystemInfoSync().windowHeight
-  
-    ctx.clearRect(0, 0, width, height)
-    ctx.setLineWidth(1)
-  
-    const textPositions = [] // 已绘制文字位置，用于避让
-  
-    geojson.features.forEach(f => {
-      const name = f.properties.name
-      let rings = []
-      if(f.geometry.type === 'Polygon') rings = f.geometry.coordinates
-      else if(f.geometry.type === 'MultiPolygon') rings = f.geometry.coordinates.flat()
-  
-      // 绘制省份
-      rings.forEach(ring => {
-        if (!ring || ring.length < 3) return
-  
-        ctx.beginPath()
-        ring.forEach((point, i) => {
-          const x = this.mapX(point[0])
-          const y = this.mapY(point[1])
-          if(i === 0) ctx.moveTo(x, y)
-          else ctx.lineTo(x, y)
-        })
-        ctx.closePath()
-  
-        ctx.setStrokeStyle('#555')
-        ctx.setFillStyle(visited.has(name) ? 'rgba(255,215,0,0.66)' : 'rgba(204,204,204,0.33)')
-        ctx.fill()
-        ctx.stroke()
-      })
-  
-      // 计算文字中心：包围盒中心
-      let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity
-      rings.forEach(ring => {
-        ring.forEach(p => {
-          minX = Math.min(minX, p[0])
-          maxX = Math.max(maxX, p[0])
-          minY = Math.min(minY, p[1])
-          maxY = Math.max(maxY, p[1])
-        })
-      })
-      let center = [(minX + maxX)/2, (minY + maxY)/2]
-  
-      // 根据面积调整字体
-      const area = (maxX - minX) * (maxY - minY)
-      let fontSize = area > 300 ? 10 : area > 100 ? 8 : 6
-      ctx.setFontSize(fontSize)
-      ctx.setFillStyle('#111')
-      ctx.setTextAlign('center')
-      ctx.setTextBaseline('middle')
-  
-      // 简单文字避让
-      let textX = this.mapX(center[0])
-      let textY = this.mapY(center[1])
-      let attempts = 0
-      while (textPositions.some(pos => Math.abs(pos.x - textX) < 20 && Math.abs(pos.y - textY) < 10) && attempts < 5) {
-        textX += 10
-        textY -= 10
-        attempts++
-      }
-      textPositions.push({x: textX, y: textY})
-  
-      ctx.fillText(name, textX, textY)
-    })
-  
-    ctx.draw()
-    this.setData({ totalProvinces: geojson.features.length })
-  },
-  
-
-  onCanvasTap(e) {
-    const { x, y } = e.detail
-    const visited = new Set(this.data.visitedProvinces)
-    let clicked = null
-
-    geojson.features.forEach(f => {
-      const name = f.properties.name
-      let rings = []
-      if(f.geometry.type === 'Polygon') rings = f.geometry.coordinates
-      else if(f.geometry.type === 'MultiPolygon') rings = f.geometry.coordinates.flat()
-
-      for (const ring of rings) {
-        const mappedRing = ring.map(p => ({ x: this.mapX(p[0]), y: this.mapY(p[1]) }))
-        if (this.pointInPolygon({x, y}, mappedRing)) {
-          clicked = name
-          break
+  initChart: function() {
+    // 获取组件
+    this.ecComponent = this.selectComponent('#map-canvas');
+    
+    // 初始化图表
+    this.ecComponent.init((canvas, width, height, dpr) => {
+      const chart = echarts.init(canvas, null, {
+        width: width,
+        height: height,
+        devicePixelRatio: dpr
+      });
+      
+      // 注册地图
+      echarts.registerMap('china', chinaGeoJSON);
+      
+      // 准备地图数据
+      const mapData = this.prepareMapData();
+      
+      // 配置图表选项
+      const option = {
+        backgroundColor: '#f5f5f5',
+        tooltip: {
+          trigger: 'item',
+          formatter: function(params) {
+            return `${params.name}<br/>${params.data ? params.data.status : '未到访'}`;
+          }
+        },
+        visualMap: {
+          type: 'piecewise',
+          pieces: [
+            {min: 1, max: 1, label: '已到访', color: '#ff6b6b'},
+            {min: 0, max: 0, label: '未到访', color: '#d9d9d9'}
+          ],
+          left: 'left',
+          top: 'bottom',
+          textStyle: {
+            color: '#000'
+          }
+        },
+        series: [{
+          name: '旅行足迹',
+          type: 'map',
+          map: 'china',
+          roam: true,
+          emphasis: {
+            label: {
+              show: true
+            }
+          },
+          data: mapData,
+          nameMap: {
+            '新疆维吾尔自治区': '新疆',
+            '西藏自治区': '西藏',
+            '内蒙古自治区': '内蒙古',
+            '广西壮族自治区': '广西',
+            '宁夏回族自治区': '宁夏',
+            '香港特别行政区': '香港',
+            '澳门特别行政区': '澳门'
+          }
+        }]
+      };
+      
+      chart.setOption(option);
+      this.chart = chart;
+      
+      // 绑定点击事件
+      chart.on('click', (params) => {
+        if (params.componentType === 'series' && params.seriesType === 'map') {
+          this.onMapClick(params.name);
         }
-      }
-    })
+      });
+      
+      return chart;
+    });
+  },
 
-    if (clicked) {
-      if (visited.has(clicked)) visited.delete(clicked)
-      else visited.add(clicked)
+  prepareMapData: function() {
+    const visitedProvinces = this.data.footprints
+      .filter(f => f.type === 'visited')
+      .map(f => f.province);
+    
+    return chinaGeoJSON.features.map(feature => {
+      const provinceName = feature.properties.name;
+      const isVisited = visitedProvinces.includes(provinceName) ? 1 : 0;
+      
+      return {
+        name: provinceName,
+        value: isVisited,
+        status: isVisited ? '已到访' : '未到访'
+      };
+    });
+  },
 
-      wx.setStorageSync('visitedProvinces', Array.from(visited))
-      this.setData({ visitedProvinces: Array.from(visited) })
-      this.drawChinaMap()
+  onMapClick: function(provinceName) {
+    // 检查是否已经记录过该省份
+    const existingFootprint = this.data.footprints.find(
+      f => f.province === provinceName && f.type === 'visited'
+    );
+    
+    if (existingFootprint) {
+      wx.showModal({
+        title: provinceName,
+        content: `到访时间: ${existingFootprint.date}\n备注: ${existingFootprint.notes || '无'}`,
+        showCancel: false
+      });
+    } else {
+      this.setData({
+        showModal: true,
+        selectedProvince: provinceName,
+        provinceIndex: this.data.provinces.indexOf(provinceName)
+      });
+    }
+  },
 
+  addFootprint: function() {
+    this.setData({
+      showModal: true
+    });
+  },
+
+  closeModal: function() {
+    this.setData({
+      showModal: false
+    });
+  },
+
+  onProvinceChange: function(e) {
+    const index = e.detail.value;
+    this.setData({
+      provinceIndex: index,
+      selectedProvince: this.data.provinces[index]
+    });
+  },
+
+  onDateChange: function(e) {
+    this.setData({
+      travelDate: e.detail.value
+    });
+  },
+
+  onNotesChange: function(e) {
+    this.setData({
+      notes: e.detail.value
+    });
+  },
+
+  saveFootprint: function() {
+    const { selectedProvince, travelDate, notes } = this.data;
+    
+    if (!selectedProvince) {
       wx.showToast({
-        title: `${clicked} 已${visited.has(clicked) ? '点亮' : '取消'}`,
+        title: '请选择省份',
         icon: 'none'
-      })
+      });
+      return;
+    }
+    
+    // 添加新足迹
+    const newFootprint = {
+      province: selectedProvince,
+      date: travelDate,
+      notes: notes,
+      type: 'visited'
+    };
+    
+    const footprints = [...this.data.footprints, newFootprint];
+    this.setData({ footprints });
+    
+    // 保存到本地存储
+    wx.setStorageSync('footprints', footprints);
+    
+    // 更新统计数据
+    this.calcStats();
+    
+    // 更新地图
+    this.updateMap();
+    
+    // 关闭模态框
+    this.closeModal();
+    
+    // 重置表单
+    this.setData({
+      travelDate: '2023-01-01',
+      notes: ''
+    });
+    
+    wx.showToast({
+      title: '足迹添加成功',
+      icon: 'success'
+    });
+  },
+
+  updateMap: function() {
+    if (this.chart) {
+      const mapData = this.prepareMapData();
+      this.chart.setOption({
+        series: [{
+          data: mapData
+        }]
+      });
     }
   },
 
-  pointInPolygon(point, vs) {
-    const {x, y} = point
-    let inside = false
-    for (let i = 0, j = vs.length - 1; i < vs.length; j = i++) {
-      const xi = vs[i].x, yi = vs[i].y
-      const xj = vs[j].x, yj = vs[j].y
-      const intersect = ((yi > y) !== (yj > y)) && (x < (xj - xi)*(y - yi)/(yj - yi) + xi)
-      if (intersect) inside = !inside
-    }
-    return inside
-  },
-})
+  viewDetails: function() {
+    wx.navigateTo({
+      url: '/pages/detail/detail'
+    });
+  }
+});

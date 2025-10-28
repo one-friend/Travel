@@ -78,7 +78,7 @@ Page({
         tooltip: {
           trigger: 'item',
           formatter: function(params) {
-            return `${params.name}<br/>${params.data ? params.data.status : '未到访'}`;
+            return `${params.name}:${params.data ? params.data.status : '未到访'}`;
           }
         },
         visualMap: {

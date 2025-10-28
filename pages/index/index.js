@@ -74,6 +74,9 @@ Page({
       
       // 配置图表选项
       const option = {
+        dataZoom:{
+          type: 'inside'
+        },
         backgroundColor: '#f5f5f5',
         tooltip: {
           trigger: 'item',
@@ -97,12 +100,30 @@ Page({
           name: '旅行足迹',
           type: 'map',
           map: 'china',
-          roam: true,
-          emphasis: {
-            label: {
-              show: true
-            }
+          roam: 'scale',
+          scaleLimit: {
+            min: 1,
+            max: 3
           },
+        
+          // // 完全禁用交互相关的视觉反馈
+          // selectedMode: false,
+          
+          // // 禁用悬停效果
+          // emphasis: {
+          //   disabled: true, // 完全禁用悬停效果
+          //   label: {
+          //     show: false
+          //   }
+          // },
+          
+          // // 禁用选中效果
+          // select: {
+          //   disabled: true,
+          //   label: {
+          //     show: false
+          //   }
+          // },
           data: mapData,
           nameMap: {
             '新疆维吾尔自治区': '新疆',
@@ -261,5 +282,17 @@ Page({
     wx.navigateTo({
       url: '/pages/detail/detail'
     });
-  }
+  },
+
+
+  // 取消地图高亮的方法
+  downplayMap: function() {
+    if (this.chart) { // 确保chart实例存在
+      // 派发downplay动作取消所有高亮[citation:1][citation:6][citation:8]
+      this.chart.dispatchAction({
+        type: 'downplay'
+      });
+      console.log('已取消地图高亮');
+    }
+  },
 });

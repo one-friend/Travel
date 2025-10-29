@@ -20,5 +20,17 @@
     "ignoreDevUnusedFiles": true
   },
   "libVersion": "3.5.8",
-  "condition": {}
+  "condition": {
+    "miniprogram": {
+      "list": [
+        {
+          "name": "pages/home/home",
+          "pathName": "pages/home/home",
+          "query": "",
+          "scene": null,
+          "launchMode": "default"
+        }
+      ]
+    }
+  }
 }

@@ -1,0 +1,37 @@
+<view class="container">
+  <!-- 顶部信息栏 -->
+  <!-- <view class="header">
+    <view class="time">{{currentTime}}</view>
+    <view class="title">串联轨迹，编织足迹故事</view>
+  </view> -->
+  
+  <!-- 地图区域 - 设置固定高度避免尺寸过大 -->
+  <view class="map-container">
+    <map 
+      id="travelMap"
+      latitude="{{centerLat}}"
+      longitude="{{centerLng}}"
+      scale="{{scale}}"
+      polygons="{{polygons}}"
+      style="width: 100%; height: {{mapHeight}}px;">
+    </map>
+  </view>
+  
+  <!-- 底部统计信息 -->
+  <view class="stats-panel">
+    <view class="stats-row">
+      <view class="stat-item">
+        <text class="stat-number">{{visitedCount}}</text>
+        <text class="stat-label">已点亮城市</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-number">{{totalDays}}</text>
+        <text class="stat-label">历时天数</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-number">{{totalArea}}</text>
+        <text class="stat-label">点亮面积(km²)</text>
+      </view>
+    </view>
+  </view>
+</view>

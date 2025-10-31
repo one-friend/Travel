@@ -1,57 +1,108 @@
 // index.js
 import * as echarts from '../../ec-canvas/echarts';
 const chinaGeoJSON = require('../../data/china.js');
-
+import { geojson } from '../../api/getGeoJson'
+var GENJSON = {}
 Page({
   data: {
     ec: {
       lazyLoad: true
     },
-    visitedCount: 0,
-    wishCount: 0,
-    totalProvinces: 34,
-    showModal: false,
-    provinces: [],
-    provinceIndex: 0,
-    selectedProvince: '',
-    travelDate: '2023-01-01',
-    notes: '',
-    footprints: [],
-    chart: null
+    chart: null,
+
+    formatRegions: [],
+    defaultRegions: []
   },
 
   onLoad: function() {
-    // 初始化省份列表
-    const provinces = chinaGeoJSON.features.map(feature => feature.properties.name);
-    this.setData({
-      provinces,
-      selectedProvince: provinces[0]
-    });
-    
-    // 初始化足迹数据
-    this.initFootprints();
-    
+
+    this.initDefaultData()
+    this.initMapHighlights()
     // 初始化图表
-    this.initChart();
+    setTimeout(()=>{
+      this.initChart();
+    },2000)
   },
-
-  initFootprints: function() {
-    // 从本地存储加载足迹数据
-    const footprints = wx.getStorageSync('footprints') || [];
-    this.setData({ footprints });
+  initDefaultData: function() {
+    const defaultRegions = [
+      {
+        province: '北京',
+        provinceCode: '16410',
+      },
+      {
+        province: '上海',
+        provinceCode: '6340',
+      },
+      {
+        province: '天津',
+        provinceCode: '14335',
+      },
+      {
+        province: '河北',
+        provinceCode: '130000',
+        citys: [
+          { name: '石家庄',area: 14335, days: 4 },
+          { name: '衡水',area: 14335, days: 4 },
+          { name: '保定',area: 14335, days: 4 },
+        ]
+      },
+      {
+        province: '内蒙古',
+        provinceCode: '150000',
+        citys: [
+          { name: '乌兰察布',area: 14335, days: 4 },
+          { name: '呼和浩特',area: 14335, days: 4 },
+          { name: '赤峰',area: 14335, days: 4 },
+        ]
+      },
+      {
+        province: '山东',
+        provinceCode: '370000',
+        citys: [
+          { name: '泰安',area: 14335, days: 4 },
+          { name: '济南',area: 14335, days: 4 },
+          { name: '青岛',area: 14335, days: 4 },
+        ]
+      },
+    ]
     
-    // 计算统计数据
-    this.calcStats();
-  },
+    const formatRegions = defaultRegions.reduce((regions, reg) => {
+      if(!reg.citys) {
+        regions.push({
+          name: reg.province,
+          area: 14335, 
+          days: 4 
+        })
+      }else {
+        regions.push(...reg.citys)
+      }
+      return regions
+    },[])
 
-  calcStats: function() {
-    const visited = this.data.footprints.filter(f => f.type === 'visited').length;
-    const wish = this.data.footprints.filter(f => f.type === 'wish').length;
-    
     this.setData({
-      visitedCount: visited,
-      wishCount: wish
-    });
+      visitedRegions: formatRegions,
+      defaultRegions: defaultRegions
+    })
+    
+   
+  },
+  initMapHighlights: async function() {
+    //获取地图数据
+    const { defaultRegions } = this.data;
+    const province_visitedRegions = defaultRegions.filter(reg => reg.citys)
+    const features = []
+    if(province_visitedRegions.length > 0) {
+      for (let index = 0; index < province_visitedRegions.length; index++) {
+        const reg = province_visitedRegions[index];
+          const result = await geojson(reg.provinceCode);
+          features.push(...result.features)
+      }
+    }
+    // console.log(features)
+    const geoJSON = chinaGeoJSON || {};
+    geoJSON.features ? geoJSON.features.push(...features) : geoJSON.features = features
+    //填充高亮区域
+    GENJSON = geoJSON
   },
 
   initChart: function() {
@@ -67,7 +118,7 @@ Page({
       });
       
       // 注册地图
-      echarts.registerMap('china', chinaGeoJSON);
+      echarts.registerMap('china', GENJSON);
       
       // 准备地图数据
       const mapData = this.prepareMapData();
@@ -105,25 +156,6 @@ Page({
             min: 1,
             max: 3
           },
-        
-          // // 完全禁用交互相关的视觉反馈
-          // selectedMode: false,
-          
-          // // 禁用悬停效果
-          // emphasis: {
-          //   disabled: true, // 完全禁用悬停效果
-          //   label: {
-          //     show: false
-          //   }
-          // },
-          
-          // // 禁用选中效果
-          // select: {
-          //   disabled: true,
-          //   label: {
-          //     show: false
-          //   }
-          // },
           data: mapData,
           nameMap: {
             '新疆维吾尔自治区': '新疆',
@@ -152,147 +184,16 @@ Page({
   },
 
   prepareMapData: function() {
-    const visitedProvinces = this.data.footprints
-      .filter(f => f.type === 'visited')
-      .map(f => f.province);
-    
-    return chinaGeoJSON.features.map(feature => {
+    const geojson = GENJSON
+    const visitedProvinces = this.data.visitedRegions.map(f => f.name);
+    return geojson.features.map(feature => {
       const provinceName = feature.properties.name;
       const isVisited = visitedProvinces.includes(provinceName) ? 1 : 0;
-      
       return {
         name: provinceName,
         value: isVisited,
         status: isVisited ? '已到访' : '未到访'
       };
     });
-  },
-
-  onMapClick: function(provinceName) {
-    // 检查是否已经记录过该省份
-    const existingFootprint = this.data.footprints.find(
-      f => f.province === provinceName && f.type === 'visited'
-    );
-    
-    if (existingFootprint) {
-      wx.showModal({
-        title: provinceName,
-        content: `到访时间: ${existingFootprint.date}\n备注: ${existingFootprint.notes || '无'}`,
-        showCancel: false
-      });
-    } else {
-      this.setData({
-        showModal: true,
-        selectedProvince: provinceName,
-        provinceIndex: this.data.provinces.indexOf(provinceName)
-      });
-    }
-  },
-
-  addFootprint: function() {
-    this.setData({
-      showModal: true
-    });
-  },
-
-  closeModal: function() {
-    this.setData({
-      showModal: false
-    });
-  },
-
-  onProvinceChange: function(e) {
-    const index = e.detail.value;
-    this.setData({
-      provinceIndex: index,
-      selectedProvince: this.data.provinces[index]
-    });
-  },
-
-  onDateChange: function(e) {
-    this.setData({
-      travelDate: e.detail.value
-    });
-  },
-
-  onNotesChange: function(e) {
-    this.setData({
-      notes: e.detail.value
-    });
-  },
-
-  saveFootprint: function() {
-    const { selectedProvince, travelDate, notes } = this.data;
-    
-    if (!selectedProvince) {
-      wx.showToast({
-        title: '请选择省份',
-        icon: 'none'
-      });
-      return;
-    }
-    
-    // 添加新足迹
-    const newFootprint = {
-      province: selectedProvince,
-      date: travelDate,
-      notes: notes,
-      type: 'visited'
-    };
-    
-    const footprints = [...this.data.footprints, newFootprint];
-    this.setData({ footprints });
-    
-    // 保存到本地存储
-    wx.setStorageSync('footprints', footprints);
-    
-    // 更新统计数据
-    this.calcStats();
-    
-    // 更新地图
-    this.updateMap();
-    
-    // 关闭模态框
-    this.closeModal();
-    
-    // 重置表单
-    this.setData({
-      travelDate: '2023-01-01',
-      notes: ''
-    });
-    
-    wx.showToast({
-      title: '足迹添加成功',
-      icon: 'success'
-    });
-  },
-
-  updateMap: function() {
-    if (this.chart) {
-      const mapData = this.prepareMapData();
-      this.chart.setOption({
-        series: [{
-          data: mapData
-        }]
-      });
-    }
-  },
-
-  viewDetails: function() {
-    wx.navigateTo({
-      url: '/pages/detail/detail'
-    });
-  },
-
-
-  // 取消地图高亮的方法
-  downplayMap: function() {
-    if (this.chart) { // 确保chart实例存在
-      // 派发downplay动作取消所有高亮[citation:1][citation:6][citation:8]
-      this.chart.dispatchAction({
-        type: 'downplay'
-      });
-      console.log('已取消地图高亮');
-    }
   },
 });

@@ -1,4 +1,5 @@
 const chinaGeoJSON = require('../../data/china.js');
+import { geojson } from '../../api/getGeoJson'
 Page({
   data: {
     currentTime: '09:34',
@@ -25,6 +26,9 @@ Page({
     
     // 初始化地图高亮
     this.initMapHighlights()
+
+    //请求地图信息
+    // geojson(650000)
   },
 
   // 计算合适的地图高度
@@ -75,26 +79,66 @@ Page({
   // 初始化默认数据（示例）
   initDefaultData: function() {
     const defaultRegions = [
-      { name: '北京', area: 16410, days: 5 },
-      { name: '上海', area: 6340, days: 3 },
-      { name: '天津', area: 14335, days: 4 },
-      { name: '河北', area: 14335, days: 4 },
-      { name: '香港', area: 14335, days: 4 },
-      { name: '澳门', area: 14335, days: 4 },
-      { name: '内蒙古', area: 14335, days: 4 },
-      { name: '甘肃', area: 14335, days: 4 },
-      { name: '云南', area: 14335, days: 4 },
-      { name: '四川', area: 14335, days: 4 },
-      { name: '陕西', area: 14335, days: 4 },
-      { name: '山东', area: 14335, days: 4 },
-      // { name: '宁夏', area: 14335, days: 4 },
+      {
+        province: '北京',
+        provinceCode: '16410',
+      },
+      {
+        province: '上海',
+        provinceCode: '6340',
+      },
+      {
+        province: '天津',
+        provinceCode: '14335',
+      },
+      {
+        province: '河北',
+        provinceCode: '130000',
+        citys: [
+          { name: '石家庄',area: 14335, days: 4 },
+          { name: '衡水',area: 14335, days: 4 },
+          { name: '保定',area: 14335, days: 4 },
+        ]
+      },
+      {
+        province: '内蒙古',
+        provinceCode: '150000',
+        citys: [
+          { name: '乌兰察布',area: 14335, days: 4 },
+          { name: '呼和浩特',area: 14335, days: 4 },
+          { name: '赤峰',area: 14335, days: 4 },
+        ]
+      },
+      {
+        province: '山东',
+        provinceCode: '370000',
+        citys: [
+          { name: '泰安',area: 14335, days: 4 },
+          { name: '济南',area: 14335, days: 4 },
+          { name: '青岛',area: 14335, days: 4 },
+        ]
+      },
     ]
     
+    const formatRegions = defaultRegions.reduce((regions, reg) => {
+      if(!reg.citys) {
+        regions.push({
+          name: reg.province,
+          area: 14335, 
+          days: 4 
+        })
+      }else {
+        regions.push(...reg.citys)
+      }
+      return regions
+    },[])
+
     this.setData({
-      visitedRegions: defaultRegions
+      visitedRegions: formatRegions,
+      defaultRegions: defaultRegions
     })
     
-    this.calculateStats(defaultRegions)
+    this.calculateStats(formatRegions)
     // this.saveVisitedData()
   },
 
@@ -126,8 +170,23 @@ Page({
   },
 
   // 初始化地图高亮区域
-  initMapHighlights: function() {
-    this.processGeoJSON(chinaGeoJSON)
+  initMapHighlights: async function() {
+    //获取地图数据
+    const { defaultRegions } = this.data;
+    const province_visitedRegions = defaultRegions.filter(reg => reg.citys)
+    const features = []
+    if(province_visitedRegions.length > 0) {
+      for (let index = 0; index < province_visitedRegions.length; index++) {
+        const reg = province_visitedRegions[index];
+         const result = await geojson(reg.provinceCode);
+         features.push(...result.features)
+      }
+    }
+    // console.log(features)
+    const geoJSON = chinaGeoJSON || {};
+    geoJSON.features ? geoJSON.features.push(...features) : geoJSON.features = features
+    //填充高亮区域
+    this.processGeoJSON(geoJSON)
   },
 
   // 验证多边形数据是否有效
@@ -147,18 +206,15 @@ Page({
   },
 
   // 处理GeoJSON数据的函数
-  // 处理GeoJSON数据的函数 - 修正版
 processGeoJSON: function(geoJSONData) {
   if (!geoJSONData || !geoJSONData.features) {
     console.error('无效的GeoJSON数据')
     return
   }
-  
   const polygons = []
   
   geoJSONData.features.forEach(feature => {
     const regionName = feature.properties && feature.properties.name
-    
     // 检查这个地区是否在已访问列表中
     if (regionName && this.data.visitedRegions.some(region => region.name === regionName)) {
       const geometryType = feature.geometry.type
@@ -229,7 +285,6 @@ processGeoJSON: function(geoJSONData) {
       }
     }
   })
-  
   this.setData({ polygons })
 },
 

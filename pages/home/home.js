@@ -36,7 +36,7 @@ Page({
     const mapHeight = systemInfo.windowHeight - headerHeight - statsHeight - 20 // 留一些边距
     
     this.setData({
-      mapHeight: Math.min(mapHeight, 600) // 限制最大高度，避免纹理过大
+      mapHeight: Math.min(mapHeight, 400) // 限制最大高度，避免纹理过大
     })
   },
 
@@ -78,7 +78,16 @@ Page({
       { name: '北京', area: 16410, days: 5 },
       { name: '上海', area: 6340, days: 3 },
       { name: '天津', area: 14335, days: 4 },
-      // { name: '河北', area: 14335, days: 4 }
+      { name: '河北', area: 14335, days: 4 },
+      { name: '香港', area: 14335, days: 4 },
+      { name: '澳门', area: 14335, days: 4 },
+      { name: '内蒙古', area: 14335, days: 4 },
+      { name: '甘肃', area: 14335, days: 4 },
+      { name: '云南', area: 14335, days: 4 },
+      { name: '四川', area: 14335, days: 4 },
+      { name: '陕西', area: 14335, days: 4 },
+      { name: '山东', area: 14335, days: 4 },
+      // { name: '宁夏', area: 14335, days: 4 },
     ]
     
     this.setData({

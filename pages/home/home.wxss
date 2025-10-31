@@ -27,7 +27,7 @@
 }
 
 .map-container {
-  flex: 1;
+  /* flex: 1; */
   position: relative;
   overflow: hidden;
   /* 高度由JS动态计算，避免过大 */

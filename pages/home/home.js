@@ -25,10 +25,8 @@ Page({
     this.loadVisitedData()
     
     // 初始化地图高亮
-    this.initMapHighlights()
+    // this.initMapHighlights()
 
-    //请求地图信息
-    // geojson(650000)
   },
 
   // 计算合适的地图高度

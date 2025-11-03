@@ -17,7 +17,7 @@ Page({
   onLoad: function() {
 
     this.initDefaultData()
-    this.initMapHighlights()
+    // this.initMapHighlights()
     // 初始化图表
     setTimeout(()=>{
       this.initChart();

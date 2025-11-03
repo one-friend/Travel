@@ -1,5 +1,6 @@
 {
-  "compileType": "miniprogram",
+  "compileType": "TravelMap",
+  "cloudfunctionRoot": "cloudfunctions/",
   "libVersion": "3.5.8",
   "packOptions": {
     "ignore": [],
@@ -36,6 +37,7 @@
     "tabIndent": "auto",
     "tabSize": 2
   },
-  "appid": "wx20d178e314509c05",
+  "appid": "wxfa9a9927b9be3f3b",
+  "cloudfunctionTemplateRoot": "cloudfunctionTemplate/",
   "simulatorPluginLibVersion": {}
 }

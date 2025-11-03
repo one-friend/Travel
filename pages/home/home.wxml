@@ -20,17 +20,12 @@
   <!-- 底部统计信息 -->
   <view class="stats-panel">
     <view class="stats-row">
+      <!-- 足迹点亮地图，回忆温暖时光。您已走过 XX 个城市，收藏了 XX 段故事。继续出发，书写下一章吧！ -->
+      <!-- 山河万里，步履不停。您已走过 12 个城市。 -->
+      <!-- 【分享我的地图】 【看看下一站去哪】 【查看旅行足迹】【继续探索】 -->
       <view class="stat-item">
         <text class="stat-number">{{visitedCount}}</text>
         <text class="stat-label">已点亮城市</text>
-      </view>
-      <view class="stat-item">
-        <text class="stat-number">{{totalDays}}</text>
-        <text class="stat-label">历时天数</text>
-      </view>
-      <view class="stat-item">
-        <text class="stat-number">{{totalArea}}</text>
-        <text class="stat-label">点亮面积(km²)</text>
       </view>
     </view>
   </view>

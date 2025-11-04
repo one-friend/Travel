@@ -2,7 +2,7 @@ const chinaGeoJSON = require('../../data/china.js');
 import { geojson } from '../../api/getGeoJson'
 import citiesByProvince from '../../data/citiesByProvince'
 import * as echarts from '../../ec-canvas/echarts';
-var GENJSON = {}
+var GENJSON = chinaGeoJSON
 // 简化省份名称的辅助函数
 function simplifyProvinceName(fullName) {
   const simplifications = {
@@ -83,9 +83,9 @@ Page({
     // 初始化地图高亮
     // this.initMapHighlights()
 
-    // setTimeout(()=>{
-    //   this.initChart();
-    // },2000)
+    setTimeout(()=>{
+      this.initChart();
+    },2000)
 
   },
 
@@ -496,6 +496,85 @@ Page({
   },
 
 
+  generateShareImage() {
+    // 获取echarts实例
+    const chart = this.chart;
+    
+    // 获取图表图片
+    chart.getDataURL({
+      type: 'png',
+      pixelRatio: 2,
+      backgroundColor: '#fff',
+      success: (res) => {
+        // 这里res.tempFilePath是图表的临时图片路径
+        // 然后可以创建一个Canvas，将图表图片和统计信息绘制到一起
+        this.drawFullImage(res.tempFilePath);
+      }
+    });
+  },
 
-
+  drawFullImage(chartImagePath) {
+    const ctx = wx.createCanvasContext('shareCanvas');
+    const { windowWidth } = wx.getSystemInfoSync();
+    
+    // 绘制背景
+    ctx.setFillStyle('#ffffff');
+    ctx.fillRect(0, 0, windowWidth, 500);
+    
+    // 绘制头部
+    const gradient = ctx.createLinearGradient(0, 0, 0, 80);
+    gradient.addColorStop(0, '#1a6dfc');
+    gradient.addColorStop(1, '#0d47a1');
+    ctx.setFillStyle(gradient);
+    ctx.fillRect(0, 0, windowWidth, 80);
+    
+    // 绘制标题
+    ctx.setFillStyle('#ffffff');
+    ctx.setFontSize(18);
+    ctx.setTextAlign('center');
+    ctx.fillText('我的旅行足迹', windowWidth / 2, 35);
+    ctx.setFontSize(14);
+    ctx.fillText('记录走过的每一个地方', windowWidth / 2, 55);
+    
+    // 绘制图表图片
+    ctx.drawImage(chartImagePath, 10, 90, windowWidth - 20, 200);
+    
+    // 绘制统计信息
+    ctx.setFillStyle('#f8f9fa');
+    ctx.fillRect(10, 300, windowWidth - 20, 80);
+    
+    // 绘制统计数据
+    ctx.setFillStyle('#1a6dfc');
+    ctx.setFontSize(20);
+    ctx.setTextAlign('center');
+    ctx.fillText('28', 70, 335);
+    ctx.fillText('156', windowWidth / 2, 335);
+    ctx.fillText('42.5', windowWidth - 70, 335);
+    
+    ctx.setFillStyle('#666666');
+    ctx.setFontSize(12);
+    ctx.fillText('已点亮城市', 70, 355);
+    ctx.fillText('历时天数', windowWidth / 2, 355);
+    ctx.fillText('点亮面积(万km²)', windowWidth - 70, 355);
+    
+    // 绘制底部信息
+    ctx.setFillStyle('#999999');
+    ctx.setFontSize(12);
+    ctx.fillText('长按图片保存分享', windowWidth / 2, 470);
+    
+    // 绘制
+    ctx.draw(false, () => {
+      // 生成图片
+      wx.canvasToTempFilePath({
+        canvasId: 'shareCanvas',
+        success: (res) => {
+          // 这里res.tempFilePath是最终生成的图片路径
+          this.setData({
+            shareImage: res.tempFilePath,
+            showResult: true
+          });
+        }
+      });
+    });
+  }
 })

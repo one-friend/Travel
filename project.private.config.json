@@ -24,11 +24,18 @@
     "miniprogram": {
       "list": [
         {
-          "name": "pages/home/home",
-          "pathName": "pages/home/home",
+          "name": "pages/cityList/cityList",
+          "pathName": "pages/cityList/cityList",
           "query": "",
           "scene": null,
           "launchMode": "default"
+        },
+        {
+          "name": "pages/home/home",
+          "pathName": "pages/home/home",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
         }
       ]
     }

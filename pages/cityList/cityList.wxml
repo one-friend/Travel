@@ -1,0 +1,61 @@
+<view class="container">
+  <!-- 头部统计信息 -->
+  <view class="header">
+    <!-- <view class="title">城市点亮地图</view> -->
+    <view class="stats">
+      <view class="stat-item">
+        <text class="stat-number">{{visitedCount}}</text>
+        <text class="stat-label">已点亮</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-number">{{totalCount}}</text>
+        <text class="stat-label">总城市</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-percent">{{visitedPercent}}%</text>
+        <text class="stat-label">完成度</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 搜索框 -->
+  <view class="search-box">
+    <input 
+      class="search-input" 
+      placeholder="搜索省份或城市..." 
+      bindinput="onSearchInput"
+      value="{{searchText}}"
+    />
+    <text class="search-icon">🔍</text>
+  </view>
+
+  <!-- 城市列表 -->
+  <scroll-view class="city-list" scroll-y>
+    <view class="province-group" wx:for="{{displayData}}" wx:key="provinceCode">
+      <!-- 省份标题 -->
+      <view class="province-header" bindtap="toggleProvince" data-province="{{item.provinceCode}}">
+        <text class="province-name">{{item.province}}</text>
+        <text class="province-stats">{{item.visitedCount}}/{{item.cities.length}}</text>
+        <text class="arrow {{item.expanded ? 'expanded' : ''}}">▼</text>
+      </view>
+
+      <!-- 城市列表 -->
+      <view class="city-container" wx:if="{{item.expanded}}">
+        <view 
+          class="city-item {{city.visited ? 'visited' : ''}}" 
+          wx:for="{{item.cities}}" 
+          wx:for-item="city"
+          wx:key="name"
+          bindtap="toggleCity"
+          data-province="{{item.provinceCode}}"
+          data-city="{{city.name}}"
+        >
+          <text class="city-name">{{city.name}}</text>
+          <text class="city-status {{city.visited ? 'visited' : ''}}">
+            {{city.visited ? '✓' : '○'}}
+          </text>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+</view>

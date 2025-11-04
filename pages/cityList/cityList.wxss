@@ -1,0 +1,158 @@
+/* pages/cityList/cityList.wxss */
+.container {
+  height: 100vh;
+  background-color: #f5f7fa;
+}
+
+/* 头部样式 */
+.header {
+  background: linear-gradient(135deg, #1a73e8, #6c8ef5);
+  color: white;
+  padding: 30rpx;
+  border-radius: 0 0 30rpx 30rpx;
+}
+
+.title {
+  font-size: 36rpx;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 30rpx;
+}
+
+.stats {
+  display: flex;
+  justify-content: space-around;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-number, .stat-percent {
+  font-size: 32rpx;
+  font-weight: bold;
+  margin-bottom: 10rpx;
+}
+
+.stat-label {
+  font-size: 24rpx;
+  opacity: 0.9;
+}
+
+/* 搜索框样式 */
+.search-box {
+  position: relative;
+  margin: 30rpx;
+  background: white;
+  border-radius: 50rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.1);
+}
+
+.search-input {
+  height: 80rpx;
+  padding: 0 80rpx 0 30rpx;
+  font-size: 28rpx;
+}
+
+.search-icon {
+  position: absolute;
+  right: 30rpx;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 32rpx;
+}
+
+/* 城市列表样式 */
+.city-list {
+  box-sizing: border-box;
+  height: calc(100vh - 400rpx);
+  padding: 0 30rpx;
+}
+
+.province-group {
+  background: white;
+  border-radius: 20rpx;
+  margin-bottom: 20rpx;
+  overflow: hidden;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.05);
+}
+
+.province-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30rpx;
+  background: #f8f9fa;
+  border-bottom: 1rpx solid #eee;
+}
+
+.province-name {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.province-stats {
+  font-size: 26rpx;
+  color: #666;
+}
+
+.arrow {
+  font-size: 24rpx;
+  color: #999;
+  transition: transform 0.3s;
+}
+
+.arrow.expanded {
+  transform: rotate(180deg);
+}
+
+.city-container {
+  background: white;
+}
+
+.city-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 25rpx 30rpx;
+  border-bottom: 1rpx solid #f5f5f5;
+  transition: background-color 0.3s;
+}
+
+.city-item:active {
+  background-color: #f8f9fa;
+}
+
+.city-item.visited {
+  background-color: #f0f7ff;
+}
+
+.city-name {
+  font-size: 28rpx;
+  color: #333;
+}
+
+.city-item.visited .city-name {
+  color: #1a73e8;
+  font-weight: bold;
+}
+
+.city-status {
+  font-size: 32rpx;
+  color: #ccc;
+}
+
+.city-status.visited {
+  color: #1a73e8;
+}
+
+/* 空状态 */
+.empty-state {
+  text-align: center;
+  padding: 100rpx 0;
+  color: #999;
+  font-size: 28rpx;
+}

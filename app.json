@@ -1,7 +1,8 @@
 {
   "pages": [
     "pages/index/index",
-    "pages/home/home"
+    "pages/home/home",
+    "pages/cityList/cityList"
   ],
   "window": {
     "navigationBarTextStyle": "black",

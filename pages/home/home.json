@@ -2,6 +2,9 @@
   "pages": [
     "pages/index/index"
   ],
+  "usingComponents": {
+    "ec-canvas": "../../ec-canvas/ec-canvas"
+  },
   "window": {
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#fff",

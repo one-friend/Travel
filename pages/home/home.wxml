@@ -16,7 +16,9 @@
       style="width: 100%; height: {{mapHeight}}px;">
     </map>
   </view>
-  
+  <view class="map-container" style="height: 40vh">
+    <ec-canvas id="map-canvas" canvas-id="map-canvas" ec="{{ ec }}"></ec-canvas>
+  </view>
   <!-- 底部统计信息 -->
   <view class="stats-panel">
     <view class="stats-row">

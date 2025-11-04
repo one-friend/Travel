@@ -1,6 +1,8 @@
 const chinaGeoJSON = require('../../data/china.js');
 import { geojson } from '../../api/getGeoJson'
 import citiesByProvince from '../../data/citiesByProvince'
+import * as echarts from '../../ec-canvas/echarts';
+var GENJSON = {}
 // 简化省份名称的辅助函数
 function simplifyProvinceName(fullName) {
   const simplifications = {
@@ -60,7 +62,12 @@ Page({
     totalArea: 0,
     visitedRegions: [], // 已访问地区列表
     mapHeight: 400, // 固定地图高度，避免尺寸过大
-    citiesByProvince: citiesByProvince
+    citiesByProvince: citiesByProvince,
+
+    ec: {
+      lazyLoad: true
+    },
+    chart: null,
   },
 
   onLoad: function() {
@@ -74,7 +81,11 @@ Page({
     this.loadVisitedData()
     
     // 初始化地图高亮
-    this.initMapHighlights()
+    // this.initMapHighlights()
+
+    // setTimeout(()=>{
+    //   this.initChart();
+    // },2000)
 
   },
 
@@ -192,6 +203,8 @@ Page({
     geoJSON.features ? geoJSON.features.push(...features) : geoJSON.features = features
     //填充高亮区域
     this.processGeoJSON(geoJSON)
+
+    GENJSON = geoJSON
   },
 
   // 验证多边形数据是否有效
@@ -388,7 +401,99 @@ Page({
     });
     
     return targetData;
-  }
+  },
+
+  initChart: function() {
+    // 获取组件
+    this.ecComponent = this.selectComponent('#map-canvas');
+    
+    // 初始化图表
+    this.ecComponent.init((canvas, width, height, dpr) => {
+      const chart = echarts.init(canvas, null, {
+        width: width,
+        height: height,
+        devicePixelRatio: dpr
+      });
+      
+      // 注册地图
+      echarts.registerMap('china', GENJSON);
+      
+      // 准备地图数据
+      const mapData = this.prepareMapData();
+      
+      // 配置图表选项
+      const option = {
+        dataZoom:{
+          type: 'inside'
+        },
+        backgroundColor: '#f5f5f5',
+        tooltip: {
+          trigger: 'item',
+          formatter: function(params) {
+            return `${params.name}:${params.data ? params.data.status : '未到访'}`;
+          }
+        },
+        visualMap: {
+          type: 'piecewise',
+          pieces: [
+            {min: 1, max: 1, label: '已到访', color: '#ff6b6b'},
+            {min: 0, max: 0, label: '未到访', color: '#d9d9d9'}
+          ],
+          left: 'left',
+          top: 'bottom',
+          textStyle: {
+            color: '#000'
+          }
+        },
+        series: [{
+          name: '旅行足迹',
+          type: 'map',
+          map: 'china',
+          roam: 'scale',
+          scaleLimit: {
+            min: 1,
+            max: 3
+          },
+          data: mapData,
+          nameMap: {
+            '新疆维吾尔自治区': '新疆',
+            '西藏自治区': '西藏',
+            '内蒙古自治区': '内蒙古',
+            '广西壮族自治区': '广西',
+            '宁夏回族自治区': '宁夏',
+            '香港特别行政区': '香港',
+            '澳门特别行政区': '澳门'
+          }
+        }]
+      };
+      
+      chart.setOption(option);
+      this.chart = chart;
+      
+      // 绑定点击事件
+      chart.on('click', (params) => {
+        if (params.componentType === 'series' && params.seriesType === 'map') {
+          this.onMapClick(params.name);
+        }
+      });
+      
+      return chart;
+    });
+  },
+
+  prepareMapData: function() {
+    const geojson = GENJSON
+    const visitedProvinces = this.data.visitedRegions.map(f => f.name);
+    return geojson.features.map(feature => {
+      const provinceName = feature.properties.name;
+      const isVisited = visitedProvinces.includes(provinceName) ? 1 : 0;
+      return {
+        name: provinceName,
+        value: isVisited,
+        status: isVisited ? '已到访' : '未到访'
+      };
+    });
+  },
 
 
 

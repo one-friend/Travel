@@ -1,5 +1,53 @@
 const chinaGeoJSON = require('../../data/china.js');
 import { geojson } from '../../api/getGeoJson'
+import citiesByProvince from '../../data/citiesByProvince'
+// 简化省份名称的辅助函数
+function simplifyProvinceName(fullName) {
+  const simplifications = {
+    '北京市': '北京',
+    '天津市': '天津',
+    '上海市': '上海',
+    '重庆市': '重庆',
+    '河北省': '河北',
+    '山西省': '山西',
+    '辽宁省': '辽宁',
+    '吉林省': '吉林',
+    '黑龙江省': '黑龙江',
+    '江苏省': '江苏',
+    '浙江省': '浙江',
+    '安徽省': '安徽',
+    '福建省': '福建',
+    '江西省': '江西',
+    '山东省': '山东',
+    '河南省': '河南',
+    '湖北省': '湖北',
+    '湖南省': '湖南',
+    '广东省': '广东',
+    '海南省': '海南',
+    '四川省': '四川',
+    '贵州省': '贵州',
+    '云南省': '云南',
+    '陕西省': '陕西',
+    '甘肃省': '甘肃',
+    '青海省': '青海',
+    '台湾省': '台湾',
+    '内蒙古自治区': '内蒙古',
+    '广西壮族自治区': '广西',
+    '西藏自治区': '西藏',
+    '宁夏回族自治区': '宁夏',
+    '新疆维吾尔自治区': '新疆',
+    '香港特别行政区': '香港',
+    '澳门特别行政区': '澳门'
+  };
+  
+  return simplifications[fullName] || fullName;
+}
+
+// 判断是否为直辖市的辅助函数
+function isMunicipality(provinceName) {
+  const municipalities = ['北京市', '天津市', '上海市', '重庆市'];
+  return municipalities.includes(provinceName);
+}
 Page({
   data: {
     currentTime: '09:34',
@@ -11,7 +59,8 @@ Page({
     totalDays: 0,
     totalArea: 0,
     visitedRegions: [], // 已访问地区列表
-    mapHeight: 400 // 固定地图高度，避免尺寸过大
+    mapHeight: 400, // 固定地图高度，避免尺寸过大
+    citiesByProvince: citiesByProvince
   },
 
   onLoad: function() {
@@ -25,7 +74,7 @@ Page({
     this.loadVisitedData()
     
     // 初始化地图高亮
-    // this.initMapHighlights()
+    this.initMapHighlights()
 
   },
 
@@ -76,54 +125,12 @@ Page({
 
   // 初始化默认数据（示例）
   initDefaultData: function() {
-    const defaultRegions = [
-      {
-        province: '北京',
-        provinceCode: '16410',
-      },
-      {
-        province: '上海',
-        provinceCode: '6340',
-      },
-      {
-        province: '天津',
-        provinceCode: '14335',
-      },
-      {
-        province: '河北',
-        provinceCode: '130000',
-        citys: [
-          { name: '石家庄',area: 14335, days: 4 },
-          { name: '衡水',area: 14335, days: 4 },
-          { name: '保定',area: 14335, days: 4 },
-        ]
-      },
-      {
-        province: '内蒙古',
-        provinceCode: '150000',
-        citys: [
-          { name: '乌兰察布',area: 14335, days: 4 },
-          { name: '呼和浩特',area: 14335, days: 4 },
-          { name: '赤峰',area: 14335, days: 4 },
-        ]
-      },
-      {
-        province: '山东',
-        provinceCode: '370000',
-        citys: [
-          { name: '泰安',area: 14335, days: 4 },
-          { name: '济南',area: 14335, days: 4 },
-          { name: '青岛',area: 14335, days: 4 },
-        ]
-      },
-    ]
+    const defaultRegions = this.convertVisitedCitiesToTargetFormat()
     
     const formatRegions = defaultRegions.reduce((regions, reg) => {
       if(!reg.citys) {
         regions.push({
           name: reg.province,
-          area: 14335, 
-          days: 4 
         })
       }else {
         regions.push(...reg.citys)
@@ -204,87 +211,87 @@ Page({
   },
 
   // 处理GeoJSON数据的函数
-processGeoJSON: function(geoJSONData) {
-  if (!geoJSONData || !geoJSONData.features) {
-    console.error('无效的GeoJSON数据')
-    return
-  }
-  const polygons = []
-  
-  geoJSONData.features.forEach(feature => {
-    const regionName = feature.properties && feature.properties.name
-    // 检查这个地区是否在已访问列表中
-    if (regionName && this.data.visitedRegions.some(region => region.name === regionName)) {
-      const geometryType = feature.geometry.type
-      const coordinates = feature.geometry.coordinates
-      
-      try {
-        if (geometryType === 'Polygon') {
-          // 单个多边形
-          const points = coordinates[0].map(coord => ({
-            longitude: coord[0],
-            latitude: coord[1]
-          }))
-          
-          if (this.isValidCoordinates(points)) {
-            polygons.push({
-              points: points,
-              strokeWidth: 1,
-              strokeColor: '#00FF00',
-              fillColor: '#00FF007F',
-              zIndex: 1
-            })
-          }
-        } else if (geometryType === 'MultiPolygon') {
-          // 多多边形：为每个多边形创建独立的polygon对象
-          // MultiPolygon的结构: [[[多边形1坐标], [多边形2坐标], ...]]
-          for (let i = 0; i < coordinates.length; i++) {
-            const polygon = coordinates[i]
-            // 每个多边形的第一个环是外环
-            if (polygon && polygon[0]) {
-              const points = polygon[0].map(coord => ({
-                longitude: coord[0],
-                latitude: coord[1]
-              }))
-              
-              if (this.isValidCoordinates(points)) {
-                polygons.push({
-                  points: points,
-                  strokeWidth: 1,
-                  strokeColor: '#00FF00',
-                  fillColor: '#00FF007F',
-                  zIndex: 1
-                })
+  processGeoJSON: function(geoJSONData) {
+    if (!geoJSONData || !geoJSONData.features) {
+      console.error('无效的GeoJSON数据')
+      return
+    }
+    const polygons = []
+    
+    geoJSONData.features.forEach(feature => {
+      const regionName = feature.properties && feature.properties.name
+      // 检查这个地区是否在已访问列表中
+      if (regionName && this.data.visitedRegions.some(region => region.name === regionName)) {
+        const geometryType = feature.geometry.type
+        const coordinates = feature.geometry.coordinates
+        
+        try {
+          if (geometryType === 'Polygon') {
+            // 单个多边形
+            const points = coordinates[0].map(coord => ({
+              longitude: coord[0],
+              latitude: coord[1]
+            }))
+            
+            if (this.isValidCoordinates(points)) {
+              polygons.push({
+                points: points,
+                strokeWidth: 1,
+                strokeColor: '#00FF00',
+                fillColor: '#00FF007F',
+                zIndex: 1
+              })
+            }
+          } else if (geometryType === 'MultiPolygon') {
+            // 多多边形：为每个多边形创建独立的polygon对象
+            // MultiPolygon的结构: [[[多边形1坐标], [多边形2坐标], ...]]
+            for (let i = 0; i < coordinates.length; i++) {
+              const polygon = coordinates[i]
+              // 每个多边形的第一个环是外环
+              if (polygon && polygon[0]) {
+                const points = polygon[0].map(coord => ({
+                  longitude: coord[0],
+                  latitude: coord[1]
+                }))
+                
+                if (this.isValidCoordinates(points)) {
+                  polygons.push({
+                    points: points,
+                    strokeWidth: 1,
+                    strokeColor: '#00FF00',
+                    fillColor: '#00FF007F',
+                    zIndex: 1
+                  })
+                }
               }
             }
+          } else if (geometryType === 'Point') {
+            // 点：创建一个小矩形区域来表示
+            const [lng, lat] = coordinates
+            const points = [
+              {longitude: lng - 0.1, latitude: lat - 0.05},
+              {longitude: lng + 0.1, latitude: lat - 0.05},
+              {longitude: lng + 0.1, latitude: lat + 0.05},
+              {longitude: lng - 0.1, latitude: lat + 0.05}
+            ]
+            
+            if (this.isValidCoordinates(points)) {
+              polygons.push({
+                points: points,
+                strokeWidth: 1,
+                strokeColor: '#00FF00',
+                fillColor: '#00FF007F',
+                zIndex: 1
+              })
+            }
           }
-        } else if (geometryType === 'Point') {
-          // 点：创建一个小矩形区域来表示
-          const [lng, lat] = coordinates
-          const points = [
-            {longitude: lng - 0.1, latitude: lat - 0.05},
-            {longitude: lng + 0.1, latitude: lat - 0.05},
-            {longitude: lng + 0.1, latitude: lat + 0.05},
-            {longitude: lng - 0.1, latitude: lat + 0.05}
-          ]
-          
-          if (this.isValidCoordinates(points)) {
-            polygons.push({
-              points: points,
-              strokeWidth: 1,
-              strokeColor: '#00FF00',
-              fillColor: '#00FF007F',
-              zIndex: 1
-            })
-          }
+        } catch (e) {
+          console.error('解析GeoJSON要素失败:', e, feature)
         }
-      } catch (e) {
-        console.error('解析GeoJSON要素失败:', e, feature)
       }
-    }
-  })
-  this.setData({ polygons })
-},
+    })
+    this.setData({ polygons })
+  },
 
   // 从GeoJSON要素中提取坐标
   extractCoordinatesFromGeoJSON: function(feature) {
@@ -338,5 +345,52 @@ processGeoJSON: function(geoJSONData) {
     }
     
     return true
+  },
+
+  // 将本地存储数据转换为目标数据结构的方法
+  convertVisitedCitiesToTargetFormat: function() {
+    // 从本地存储获取已访问的城市数据
+    const visitedCities = wx.getStorageSync('visitedCities') || {};
+    // 完整的省份数据结构（使用您提供的数据）
+    const citiesByProvince = this.data.citiesByProvince
+
+    // 创建目标数据结构
+    const targetData = [];
+    
+    // 遍历所有省份
+    citiesByProvince.forEach(province => {
+      // 获取该省份下已访问的城市
+      const visitedCitiesInProvince = province.cities.filter(city => {
+        const cityKey = `${province.provinceCode}-${city.name}`;
+        return visitedCities[cityKey] === true;
+      });
+      
+      // 如果该省份有已访问的城市，或者该省份是直辖市且已访问
+      if (visitedCitiesInProvince.length > 0) {
+        // 简化省份名称（去掉"市"、"省"、"自治区"等后缀）
+        const simplifiedProvinceName = simplifyProvinceName(province.province);
+        
+        // 创建省份对象
+        const provinceObj = {
+          province: simplifiedProvinceName,
+          provinceCode: province.provinceCode
+        };
+        
+        // 如果不是直辖市，添加城市列表
+        if (!isMunicipality(province.province)) {
+          provinceObj.citys = visitedCitiesInProvince.map(city => ({
+            name: city.name
+          }));
+        }
+        
+        targetData.push(provinceObj);
+      }
+    });
+    
+    return targetData;
   }
+
+
+
+
 })

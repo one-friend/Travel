@@ -59,8 +59,6 @@ Page({
     scale: 3, // 地图缩放级别
     polygons: [], // 高亮区域数据
     visitedCount: 0,
-    totalDays: 0,
-    totalArea: 0,
     visitedRegions: [], // 已访问地区列表
     mapHeight: 400, // 固定地图高度，避免尺寸过大
     citiesByProvince: citiesByProvince,
@@ -115,24 +113,7 @@ Page({
 
   // 加载已访问地区数据
   loadVisitedData: function() {
-    try {
-      // 尝试从本地存储加载数据
-      const storedData = wx.getStorageSync('visitedRegions')
-      if (storedData) {
-        this.setData({
-          visitedRegions: storedData.regions || [],
-          visitedCount: storedData.visitedCount || 0,
-          totalDays: storedData.totalDays || 0,
-          totalArea: storedData.totalArea || 0
-        })
-      } else {
-        // 如果没有存储数据，使用默认示例数据
-        this.initDefaultData()
-      }
-    } catch (e) {
-      console.error('加载数据失败:', e)
-      this.initDefaultData()
-    }
+    this.initDefaultData()
   },
 
   // 初始化默认数据（示例）
@@ -156,34 +137,19 @@ Page({
     })
     
     this.calculateStats(formatRegions)
-    // this.saveVisitedData()
   },
 
   // 计算统计数据
   calculateStats: function(regions) {
     const visitedCount = regions.length
-    const totalDays = regions.reduce((sum, region) => sum + (region.days || 1), 0)
-    const totalArea = regions.reduce((sum, region) => sum + (region.area || 0), 0)
+    // const totalDays = regions.reduce((sum, region) => sum + (region.days || 1), 0)
+    // const totalArea = regions.reduce((sum, region) => sum + (region.area || 0), 0)
     
     this.setData({
       visitedCount,
-      totalDays,
-      totalArea: Math.round(totalArea)
+      // totalDays,
+      // totalArea: Math.round(totalArea)
     })
-  },
-
-  // 保存数据到本地存储
-  saveVisitedData: function() {
-    try {
-      wx.setStorageSync('visitedRegions', {
-        regions: this.data.visitedRegions,
-        visitedCount: this.data.visitedCount,
-        totalDays: this.data.totalDays,
-        totalArea: this.data.totalArea
-      })
-    } catch (e) {
-      console.error('保存数据失败:', e)
-    }
   },
 
   // 初始化地图高亮区域

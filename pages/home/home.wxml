@@ -19,6 +19,10 @@
   <view class="map-container" style="height: 40vh">
     <ec-canvas id="map-canvas" canvas-id="map-canvas" ec="{{ ec }}"></ec-canvas>
   </view>
+   <view class="action-buttons">
+    <button class="btn btn-primary" bindtap="generateShareImage">生成分享图片</button>
+  </view>
+  <canvas canvas-id="shareCanvas" class="hidden-canvas"></canvas>
   <!-- 底部统计信息 -->
   <view class="stats-panel">
     <view class="stats-row">

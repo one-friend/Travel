@@ -414,7 +414,7 @@ Page({
         height: height,
         devicePixelRatio: dpr
       });
-      
+     
       // 注册地图
       echarts.registerMap('china', GENJSON);
       
@@ -469,7 +469,7 @@ Page({
       
       chart.setOption(option);
       this.chart = chart;
-      
+      this.canvas = canvas;   // ✅ 保存 canvas 供导出使用
       // 绑定点击事件
       chart.on('click', (params) => {
         if (params.componentType === 'series' && params.seriesType === 'map') {
@@ -495,22 +495,40 @@ Page({
     });
   },
 
+  exportChartImage() {
+    if (!this.ecComponent) {
+      return wx.showToast({ title: '图表尚未初始化', icon: 'none' });
+    }
 
-  generateShareImage() {
-    // 获取echarts实例
-    const chart = this.chart;
-    
-    // 获取图表图片
-    chart.getDataURL({
-      type: 'png',
-      pixelRatio: 2,
-      backgroundColor: '#fff',
+    this.ecComponent.canvasToTempFilePath({
+      fileType: 'png',
+      quality: 1,
       success: (res) => {
-        // 这里res.tempFilePath是图表的临时图片路径
-        // 然后可以创建一个Canvas，将图表图片和统计信息绘制到一起
-        this.drawFullImage(res.tempFilePath);
+        console.log('导出成功:', res.tempFilePath);
+        wx.previewImage({
+          urls: [res.tempFilePath]
+        });
+      },
+      fail: (err) => {
+        console.error('导出失败:', err);
+        wx.showToast({ title: '导出失败', icon: 'none' });
       }
     });
+  },
+  getChartImage() {
+    return new Promise((resolve, reject) => {
+      wx.canvasToTempFilePath({
+        canvas: this.canvas,
+        success: res => resolve(res.tempFilePath),
+        fail: reject
+      });
+    });
+  },
+   // 生成分享图片 - 修正版
+  async generateShareImage() {
+    this.exportChartImage()
+    // const chartPath = await this.getChartImage();
+    // console.log(chartPath)
   },
 
   drawFullImage(chartImagePath) {

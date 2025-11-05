@@ -22,9 +22,11 @@
    <view class="action-buttons">
     <button class="btn btn-primary" bindtap="generateShareImage">生成分享图片</button>
   </view>
-  <canvas canvas-id="posterCanvas"  style="width: 750rpx; height: 1200rpx; position: fixed; left: -9999rpx;" 
-  width="750" 
-  height="1200" />
+  <canvas 
+    id="posterCanvas" 
+    canvas-id="posterCanvas"
+    style="position: fixed; top: -9999rpx; left: -9999rpx; width: 600px; height: 1000px;"
+  ></canvas>
   <!-- 底部统计信息 -->
   <view class="stats-panel">
     <view class="stats-row">

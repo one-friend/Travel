@@ -1,26 +1,33 @@
 // utils/canvasExport.js
 export function exportEChartImage(echartsComponent, opts = {}) {
   return new Promise((resolve, reject) => {
-    const query = wx.createSelectorQuery();
-    query.select(`#${echartsComponent.id}`).boundingClientRect(rect => {
-      const width = rect.width;
-      const height = rect.height;
-      const dpr = wx.getSystemInfoSync().pixelRatio;
-
-      echartsComponent.canvasToTempFilePath({
-        width,
-        height,
-        destWidth: width * dpr * 2,
-        destHeight: height * dpr * 2,
-        fileType: opts.fileType || 'png',
-        quality: opts.quality || 1,
-        success(res) {
-          resolve(res.tempFilePath);
-        },
-        fail(err) {
-          reject(err);
+    // 先等待一下确保图表渲染完成
+    setTimeout(() => {
+      const query = wx.createSelectorQuery();
+      query.select(`#${echartsComponent.id}`).boundingClientRect(rect => {
+        if (!rect || rect.width === 0) {
+          reject(new Error('图表容器未找到或宽度为0'));
+          return;
         }
-      });
-    }).exec();
+
+        const dpr = wx.getSystemInfoSync().pixelRatio;
+        
+        echartsComponent.canvasToTempFilePath({
+          x: 0,
+          y: 0,
+          width: rect.width,
+          height: rect.height,
+          destWidth: rect.width * dpr,
+          destHeight: rect.height * dpr,
+          fileType: opts.fileType || 'png',
+          quality: opts.quality || 1,
+          success(res) {
+            console.log('图表导出成功:', res.tempFilePath);
+            resolve(res.tempFilePath);
+          },
+          fail: reject
+        });
+      }).exec();
+    }, 1000); // 重要：给图表足够时间渲染
   });
 }

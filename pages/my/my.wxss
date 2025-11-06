@@ -1,0 +1,68 @@
+/* pages/my/my.wxss */
+/* 页面整体样式 */
+.container {
+  padding: 20px;
+}
+
+/* 头像和用户名 */
+.profile {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.avatar {
+  width: 60px;
+  height: 60px;
+  border: 1px solid #ccc;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+.username {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+/* 城市列表 */
+.section {
+  margin-bottom: 20px;
+}
+.section-title {
+  font-size: 16px;
+  color: #333;
+  margin-bottom: 10px;
+}
+.city-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.city-item {
+  background-color: #f0f0f0;
+  padding: 8px 12px;
+  border-radius: 12px;
+  font-size: 14px;
+}
+
+/* 设置按钮 */
+.settings {
+  display: flex;
+  flex-direction: column;
+}
+.setting-button {
+  margin: 5px 0;
+  padding: 10px;
+  background-color: #007aff;
+  color: white;
+  border-radius: 5px;
+  text-align: center;
+}
+
+/* 退出按钮 */
+.logout-button {
+  margin-top: 20px;
+  width: 100%;
+  padding: 12px;
+  background-color: #ff3b30;
+  color: white;
+  border-radius: 5px;
+}

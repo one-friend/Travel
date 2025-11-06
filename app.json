@@ -2,7 +2,8 @@
   "pages": [
     "pages/index/index",
     "pages/home/home",
-    "pages/cityList/cityList"
+    "pages/cityList/cityList",
+    "pages/my/my"
   ],
   "window": {
     "navigationBarTextStyle": "black",

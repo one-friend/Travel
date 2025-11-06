@@ -1,9 +1,9 @@
-// pages/cityList/cityList.js
 // 导入城市数据
 import citiesByProvince from '../../data/citiesByProvince'
 Page({
   data: {
-    displayData: [],  // 只维护一套数据
+    citiesData: [],
+    displayData: [],
     searchText: '',
     visitedCount: 0,
     totalCount: 0,
@@ -28,6 +28,7 @@ Page({
     }));
 
     this.setData({
+      citiesData: processedData,
       displayData: processedData
     });
 
@@ -38,7 +39,7 @@ Page({
   // 计算总数
   calculateTotalCount() {
     let total = 0;
-    this.data.displayData.forEach(province => {
+    this.data.citiesData.forEach(province => {
       total += province.cities.length;
     });
     this.setData({ totalCount: total });
@@ -47,7 +48,7 @@ Page({
   // 加载已访问状态
   loadVisitedStatus() {
     const visitedCities = wx.getStorageSync('visitedCities') || {};
-    const updatedData = this.data.displayData.map(province => {
+    const updatedData = this.data.citiesData.map(province => {
       let visitedCount = 0;
       const cities = province.cities.map(city => {
         const isVisited = visitedCities[`${province.provinceCode}-${city.name}`] || false;
@@ -58,6 +59,7 @@ Page({
     });
 
     this.setData({
+      citiesData: updatedData,
       displayData: updatedData
     });
     this.calculateStats();
@@ -74,36 +76,6 @@ Page({
       visitedCount,
       visitedPercent
     });
-  },
-
-  // 获取显示数据（动态计算，支持搜索过滤）
-  getDisplayData() {
-    const { displayData, searchText } = this.data;
-    
-    if (!searchText.trim()) {
-      return displayData;
-    }
-
-    return displayData.map(province => {
-      // 检查省份名称是否匹配
-      const provinceMatch = province.province.includes(searchText);
-      
-      // 检查城市名称是否匹配
-      const filteredCities = province.cities.filter(city => 
-        city.name.includes(searchText)
-      );
-      
-      // 如果省份匹配或城市匹配，则显示该省份
-      if (provinceMatch || filteredCities.length > 0) {
-        return {
-          ...province,
-          expanded: true, // 搜索时自动展开匹配的省份
-          cities: provinceMatch ? province.cities : filteredCities
-        };
-      }
-      
-      return null;
-    }).filter(province => province !== null);
   },
 
   // 切换省份展开/收起
@@ -132,7 +104,7 @@ Page({
     visitedCities[cityKey] = newVisitedState;
     wx.setStorageSync('visitedCities', visitedCities);
     
-    // 更新数据
+    // 更新显示数据
     this.loadVisitedStatus();
     
     // 显示提示
@@ -147,8 +119,33 @@ Page({
   onSearchInput(e) {
     const searchText = e.detail.value;
     this.setData({ searchText });
-    
-    // 触发视图更新，getDisplayData会在wxml中调用
-    this.setData({});
+
+    if (!searchText.trim()) {
+      this.setData({ displayData: this.data.citiesData });
+      return;
+    }
+
+    const filteredData = this.data.citiesData.map(province => {
+      // 检查省份名称是否匹配
+      const provinceMatch = province.province.includes(searchText);
+      
+      // 检查城市名称是否匹配
+      const filteredCities = province.cities.filter(city => 
+        city.name.includes(searchText)
+      );
+      
+      // 如果省份匹配或城市匹配，则显示该省份
+      if (provinceMatch || filteredCities.length > 0) {
+        return {
+          ...province,
+          expanded: true,
+          cities: provinceMatch ? province.cities : filteredCities
+        };
+      }
+      
+      return null;
+    }).filter(province => province !== null);
+
+    this.setData({ displayData: filteredData });
   }
 });

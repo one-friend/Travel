@@ -1,7 +1,6 @@
 <view class="container">
   <!-- 头部统计信息 -->
   <view class="header">
-    <!-- <view class="title">城市点亮地图</view> -->
     <view class="stats">
       <view class="stat-item">
         <text class="stat-number">{{visitedCount}}</text>
@@ -19,7 +18,7 @@
   </view>
 
   <!-- 搜索框 -->
-  <view class="search-box">
+  <!-- <view class="search-box">
     <input 
       class="search-input" 
       placeholder="搜索省份或城市..." 
@@ -27,35 +26,29 @@
       value="{{searchText}}"
     />
     <text class="search-icon">🔍</text>
-  </view>
+  </view> -->
 
-  <!-- 城市列表 -->
   <scroll-view class="city-list" scroll-y>
-    <view class="province-group" wx:for="{{displayData}}" wx:key="provinceCode">
-      <!-- 省份标题 -->
-      <view class="province-header" bindtap="toggleProvince" data-province="{{item.provinceCode}}">
-        <text class="province-name">{{item.province}}</text>
-        <text class="province-stats">{{item.visitedCount}}/{{item.cities.length}}</text>
-        <text class="arrow {{item.expanded ? 'expanded' : ''}}">▼</text>
+    <view class="section" wx:for="{{displayData}}" wx:key="name">
+      <view class="section-header">
+        <text class="section-title">{{item.province}}（已点亮{{item.visitedCount}}/{{item.cities.length}}）</text>
       </view>
-
-      <!-- 城市列表 -->
-      <view class="city-container" wx:if="{{item.expanded}}">
+      
+      <view class="cities-grid">
         <view 
           class="city-item {{city.visited ? 'visited' : ''}}" 
           wx:for="{{item.cities}}" 
-          wx:for-item="city"
           wx:key="name"
+          wx:for-item="city"
           bindtap="toggleCity"
           data-province="{{item.provinceCode}}"
           data-city="{{city.name}}"
         >
-          <text class="city-name">{{city.name}}</text>
-          <text class="city-status {{city.visited ? 'visited' : ''}}">
-            {{city.visited ? '✓' : '○'}}
-          </text>
+          {{city.name}}
         </view>
       </view>
+      
+      <view class="divider" wx:if="{{index < provinces.length - 1}}"></view>
     </view>
   </scroll-view>
 </view>

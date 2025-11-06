@@ -1,9 +1,4 @@
 /* pages/cityList/cityList.wxss */
-.container {
-  height: 100vh;
-  background-color: #f5f7fa;
-}
-
 /* 头部样式 */
 .header {
   background: linear-gradient(135deg, #1a73e8, #6c8ef5);
@@ -64,95 +59,74 @@
   font-size: 32rpx;
 }
 
-/* 城市列表样式 */
-.city-list {
-  box-sizing: border-box;
-  height: calc(100vh - 400rpx);
-  padding: 0 30rpx;
-}
 
-.province-group {
-  background: white;
-  border-radius: 20rpx;
-  margin-bottom: 20rpx;
-  overflow: hidden;
-  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.05);
-}
 
-.province-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.container {
   padding: 30rpx;
-  background: #f8f9fa;
-  border-bottom: 1rpx solid #eee;
+  min-height: 100vh;
+  background-color: rgb(29, 39, 59);
 }
 
-.province-name {
-  font-size: 32rpx;
+.page-title {
+  font-size: 40rpx;
   font-weight: bold;
+  text-align: center;
+  margin-bottom: 40rpx;
   color: #333;
 }
 
-.province-stats {
-  font-size: 26rpx;
-  color: #666;
+.section {
+  margin-bottom: 50rpx;
 }
 
-.arrow {
+.section-header {
+  margin-bottom: 20rpx;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: white;
+}
+
+.dates {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 20rpx;
+}
+
+.date {
   font-size: 24rpx;
-  color: #999;
-  transition: transform 0.3s;
+  color: #666;
+  margin-right: 30rpx;
+  margin-bottom: 10rpx;
 }
 
-.arrow.expanded {
-  transform: rotate(180deg);
+.divider {
+  height: 1rpx;
+  background-color: #e0e0e0;
+  margin: 30rpx 0;
 }
 
-.city-container {
-  background: white;
+.cities-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
 }
 
 .city-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 25rpx 30rpx;
-  border-bottom: 1rpx solid #f5f5f5;
-  transition: background-color 0.3s;
-}
-
-.city-item:active {
-  background-color: #f8f9fa;
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 10rpx;
+  padding: 20rpx 10rpx;
+  text-align: center;
+  font-size: 28rpx;
+  color: #666;
+  box-sizing: border-box;
+  background-color: azure;
 }
 
 .city-item.visited {
-  background-color: #f0f7ff;
-}
-
-.city-name {
-  font-size: 28rpx;
-  color: #333;
-}
-
-.city-item.visited .city-name {
-  color: #1a73e8;
   font-weight: bold;
-}
-
-.city-status {
-  font-size: 32rpx;
-  color: #ccc;
-}
-
-.city-status.visited {
-  color: #1a73e8;
-}
-
-/* 空状态 */
-.empty-state {
-  text-align: center;
-  padding: 100rpx 0;
-  color: #999;
-  font-size: 28rpx;
+  color: #333;
 }

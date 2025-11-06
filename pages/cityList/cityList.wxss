@@ -120,10 +120,14 @@
   border-radius: 10rpx;
   padding: 20rpx 10rpx;
   text-align: center;
-  font-size: 28rpx;
+  font-size: 40rpx;
+  font-weight: 500;
   color: #666;
   box-sizing: border-box;
   background-color: azure;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .city-item.visited {

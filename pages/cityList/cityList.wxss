@@ -1,41 +1,4 @@
 /* pages/cityList/cityList.wxss */
-/* 头部样式 */
-.header {
-  background: linear-gradient(135deg, #1a73e8, #6c8ef5);
-  color: white;
-  padding: 30rpx;
-  border-radius: 0 0 30rpx 30rpx;
-}
-
-.title {
-  font-size: 36rpx;
-  font-weight: bold;
-  text-align: center;
-  margin-bottom: 30rpx;
-}
-
-.stats {
-  display: flex;
-  justify-content: space-around;
-}
-
-.stat-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.stat-number, .stat-percent {
-  font-size: 32rpx;
-  font-weight: bold;
-  margin-bottom: 10rpx;
-}
-
-.stat-label {
-  font-size: 24rpx;
-  opacity: 0.9;
-}
-
 /* 搜索框样式 */
 .search-box {
   position: relative;
@@ -64,7 +27,7 @@
 .container {
   padding: 30rpx;
   min-height: 100vh;
-  background-color: rgb(29, 39, 59);
+  background-color: #ebebeb;
 }
 
 .page-title {
@@ -86,7 +49,7 @@
 .section-title {
   font-size: 32rpx;
   font-weight: bold;
-  color: white;
+  color: #333;
 }
 
 .dates {
@@ -120,11 +83,10 @@
   border-radius: 10rpx;
   padding: 20rpx 10rpx;
   text-align: center;
-  font-size: 40rpx;
-  font-weight: 500;
+  font-size: 36rpx;
   color: #666;
   box-sizing: border-box;
-  background-color: azure;
+  background-color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -132,5 +94,6 @@
 
 .city-item.visited {
   font-weight: bold;
-  color: #333;
+  color: #fff;
+  background-color: #1a73e8;
 }

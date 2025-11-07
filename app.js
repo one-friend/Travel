@@ -24,5 +24,8 @@ App({
   },
   globalData: {
     userInfo: null
-  }
+  },
+  setGlobalData: function(key,data) {
+    this.globalData[key] = data;
+  },
 })

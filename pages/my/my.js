@@ -1,3 +1,4 @@
+const app = getApp()
 Page({
   data: {
     userInfo: {
@@ -23,19 +24,25 @@ Page({
   chooseAvatar(e){
     let { userInfo } = this.data;
     userInfo.avatarUrl = e.detail.avatarUrl;
-    this.setData({
-      userInfo
-    })
+    this.asyncUserInfo(userInfo);
   },
 
   inputNickName(e){
     let { userInfo } = this.data;
     userInfo.nickName = e.detail.value;
+    this.asyncUserInfo(userInfo);
+  },
+
+  asyncUserInfo(userInfo){
     this.setData({
       userInfo
     })
+    wx.setStorage({
+      key:'userInfo',
+      data: userInfo
+    })
+    app.setGlobalData('userInfo',userInfo);
   },
-
   // 退出登录
   logout() {
     wx.removeStorageSync('userInfo');  // 清除用户信息缓存

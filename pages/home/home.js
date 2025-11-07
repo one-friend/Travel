@@ -3,6 +3,7 @@ import { geojson } from '../../api/getGeoJson'
 import citiesByProvince from '../../data/citiesByProvince'
 import * as echarts from '../../ec-canvas/echarts';
 import { createSharePoster } from '../../utils/poster';
+const app = getApp()
 var GENJSON = chinaGeoJSON
 // 简化省份名称的辅助函数
 function simplifyProvinceName(fullName) {
@@ -373,7 +374,7 @@ Page({
   initChart: function() {
     // 获取组件
     this.ecComponent = this.selectComponent('#map-canvas');
-    
+    console.log(this.ecComponent)
     // 初始化图表
     this.ecComponent.init((canvas, width, height, dpr) => {
       const chart = echarts.init(canvas, null, {
@@ -493,13 +494,14 @@ Page({
   },
    // 生成分享图片
   async generateShareImage() {
+    const userInfo = app.globalData.userInfo
     console.log('generateShareImage 点击触发了')
      try {
         const filePath = await createSharePoster({
           chartComponent: this.ecComponent,
           userInfo: {
-            nickname: '不懒',
-            avatar: ''   // ✅ 暂时为空
+            nickname: userInfo.nickName,
+            avatar: userInfo.avatarUrl  // ✅ 暂时为空
           },
           text: {
             title: `我已经点亮了100个城市`,

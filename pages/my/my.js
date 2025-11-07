@@ -1,6 +1,9 @@
 Page({
   data: {
-    userInfo: {},
+    userInfo: {
+      avatarUrl: 'https://mmbiz.qpic.cn/mmbiz/icTdbqWNOwNRna42FI242Lcia07jQodd2FJGIYQfG0LAJGFxM4FbnQP6yfMxBgJ0F3YRqJCJ1aPAK2dQagdusBZg/0',
+      nickName:'微信用户'
+    },
     visitedCities: [],
   },
 
@@ -8,7 +11,6 @@ Page({
     // 假设你已经获取了用户信息和已点亮的城市
     const visitedCities = wx.getStorageSync('visitedCities') || {}
     this.setData({
-      userInfo: wx.getStorageSync('userInfo'),  // 从缓存获取用户信息
       visitedCities: this.getCitiesWithTrueValue(visitedCities), // 从缓存获取已点亮城市
     });
   },
@@ -17,18 +19,21 @@ Page({
       .filter(key => data[key] === true)  // 过滤出值为 true 的城市
       .map(key => key.split('-')[1]);     // 提取城市名（按 "-" 分割，取第二部分）
   },
-  // 跳转到个人资料页面
-  goToSettings() {
-    wx.navigateTo({
-      url: '/pages/settings/settings',  // 你需要自己实现这个页面
-    });
+
+  chooseAvatar(e){
+    let { userInfo } = this.data;
+    userInfo.avatarUrl = e.detail.avatarUrl;
+    this.setData({
+      userInfo
+    })
   },
 
-  // 跳转到帮助页面
-  goToHelp() {
-    wx.navigateTo({
-      url: '/pages/help/help',  // 你需要自己实现这个页面
-    });
+  inputNickName(e){
+    let { userInfo } = this.data;
+    userInfo.nickName = e.detail.value;
+    this.setData({
+      userInfo
+    })
   },
 
   // 退出登录

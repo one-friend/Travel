@@ -2,31 +2,24 @@
 <view class="container">
   <!-- 头像和用户名 -->
   <view class="profile">
-    <image class="avatar" src="{{userInfo.avatarUrl}}" />
-    <text class="username">1111</text>
+    <button  open-type="chooseAvatar" class="avatar_btn" bindchooseavatar="chooseAvatar">
+      <image class="avatar" src="{{userInfo.avatarUrl}}" mode="widthFix"></image>
+    </button>
+    <input class="username" type="nickname" value="{{userInfo.nickName}}" bindinput="inputNickName" />
   </view>
 
   <!-- 我的城市 -->
-  <view class="section">
+  <!-- <view class="section">
     <text class="section-title">已点亮的城市</text>
     <view class="city-list">
       <block wx:for="{{visitedCities}}" wx:key="index">
         <view class="city-item">{{item}}</view>
       </block>
     </view>
-  </view>
-
-  <!-- 设置 -->
-  <view class="section">
-    <text class="section-title">设置</text>
-    <view class="settings">
-      <button class="setting-button" bindtap="goToSettings">个人资料</button>
-      <button class="setting-button" bindtap="goToHelp">帮助</button>
-    </view>
-  </view>
+  </view> -->
 
   <!-- 退出按钮 -->
   <view class="section">
-    <button class="logout-button" bindtap="logout">退出登录</button>
+    <!-- <button class="logout-button" bindtap="logout">退出登录</button> -->
   </view>
 </view>

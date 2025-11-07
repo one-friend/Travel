@@ -22,6 +22,9 @@
    <view class="action-buttons">
     <button class="btn btn-primary" bindtap="generateShareImage">生成分享图片</button>
   </view>
+   <view class="action-buttons">
+    <button class="btn btn-primary" bindtap="gomypage">去mypage</button>
+  </view>
   <canvas 
     id="posterCanvas" 
     canvas-id="posterCanvas"

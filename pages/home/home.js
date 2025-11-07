@@ -81,7 +81,7 @@ Page({
     this.loadVisitedData()
     
     // 初始化地图高亮
-    // this.initMapHighlights()
+    this.initMapHighlights()
 
     setTimeout(()=>{
       this.initChart();
@@ -515,5 +515,11 @@ Page({
         console.error('❌ 生成失败:', err);
       }
   },
+
+  gomypage(){
+     wx.navigateTo({
+      url: '/pages/my/my'
+    })
+  }
 
 })

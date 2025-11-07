@@ -5,7 +5,7 @@
     <button  open-type="chooseAvatar" class="avatar_btn" bindchooseavatar="chooseAvatar">
       <image class="avatar" src="{{userInfo.avatarUrl}}" mode="widthFix"></image>
     </button>
-    <input class="username" type="nickname" value="{{userInfo.nickName}}" bindinput="inputNickName" />
+    <input class="username" type="nickname" value="{{userInfo.nickName}}" bindchange="inputNickName" />
   </view>
 
   <!-- 我的城市 -->

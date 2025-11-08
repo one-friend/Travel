@@ -55,7 +55,7 @@ function isMunicipality(provinceName) {
 Page({
   data: {
     currentTime: '09:34',
-    centerLat: 35, // 地图中心纬度 - 中国中部
+    centerLat: 32, // 地图中心纬度 - 中国中部
     centerLng: 105, // 地图中心经度
     scale: 3, // 地图缩放级别
     polygons: [], // 高亮区域数据
@@ -81,11 +81,7 @@ Page({
     this.loadVisitedData()
     
     // 初始化地图高亮
-    this.initMapHighlights()
-
-    setTimeout(()=>{
-      this.initChart();
-    },2000)
+    // this.initMapHighlights(()=>{this.initChart()})
 
   },
 
@@ -154,7 +150,7 @@ Page({
   },
 
   // 初始化地图高亮区域
-  initMapHighlights: async function() {
+  initMapHighlights: async function(cb) {
     //获取地图数据
     const { defaultRegions } = this.data;
     const province_visitedRegions = defaultRegions.filter(reg => reg.citys)
@@ -172,7 +168,8 @@ Page({
     //填充高亮区域
     this.processGeoJSON(geoJSON)
 
-    GENJSON = geoJSON
+    GENJSON = geoJSON;
+    cb&&cb()
   },
 
   // 验证多边形数据是否有效
@@ -496,24 +493,38 @@ Page({
   async generateShareImage() {
     const userInfo = app.globalData.userInfo
     console.log('generateShareImage 点击触发了')
-     try {
-        const filePath = await createSharePoster({
-          chartComponent: this.ecComponent,
-          userInfo: {
-            nickname: userInfo.nickName,
-            avatar: userInfo.avatarUrl  // ✅ 暂时为空
-          },
-          text: {
-            title: `我已经点亮了100个城市`,
-            desc: '继续去看看更大的世界吧！'
-          },
-          watermark: '不懒的旅行地图'
-        });
-        console.log('✅ 生成成功:', filePath);
-        wx.previewImage({ urls: [filePath] });
-      } catch (err) {
-        console.error('❌ 生成失败:', err);
-      }
+    wx.showLoading({
+      title: '生成中',
+    })
+    if(this.ecComponent) {
+      setTimeout(async () => {
+        try {
+          const filePath = await createSharePoster({
+            chartComponent: this.ecComponent,
+            userInfo: {
+              nickname: userInfo?.nickName || '微信用户',
+              avatar: userInfo?.avatarUrl  
+            },
+            text: {
+              title: `我已经点亮了100个城市`,
+              desc: '继续去看看更大的世界吧！'
+            },
+            watermark: '不懒的旅行地图'
+          });
+          console.log('✅ 生成成功:', filePath);
+          wx.hideLoading()
+          wx.previewImage({ urls: [filePath] });
+        } catch (err) {
+          wx.hideLoading()
+          wx.showToast({
+            title: '生成失败',
+            icon:'error'
+          })
+          console.error('❌ 生成失败:', err);
+        }
+      }, 1500);
+    }
+     
   },
 
   gomypage(){

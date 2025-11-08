@@ -16,20 +16,13 @@
       style="width: 100%; height: {{mapHeight}}px;">
     </map>
   </view>
-  <view class="map-container" style="height: 40vh">
-    <ec-canvas id="map-canvas" canvas-id="map-canvas" ec="{{ ec }}"></ec-canvas>
+   <view class="action-buttons">
+    <button class="btn btn-primary" bindtap="generateShareImage">生成专属海报</button>
   </view>
    <view class="action-buttons">
-    <button class="btn btn-primary" bindtap="generateShareImage">生成分享图片</button>
+    <button class="btn btn-primary" bindtap="gomypage">城市列表</button>
   </view>
-   <view class="action-buttons">
-    <button class="btn btn-primary" bindtap="gomypage">去mypage</button>
-  </view>
-  <canvas 
-    id="posterCanvas" 
-    canvas-id="posterCanvas"
-    style="position: fixed; top: -9999rpx; left: -9999rpx; width: 600px; height: 1000px;"
-  ></canvas>
+  
   <!-- 底部统计信息 -->
   <view class="stats-panel">
     <view class="stats-row">
@@ -42,4 +35,12 @@
       </view>
     </view>
   </view>
+  <view class="map-container" style="height: 40vh; z-index: -1; opacity: 0; transform: translateX(-100%);">
+    <ec-canvas id="map-canvas" canvas-id="map-canvas" ec="{{ ec }}"></ec-canvas>
+  </view>
+  <canvas 
+    id="posterCanvas" 
+    canvas-id="posterCanvas"
+    style="position: fixed; top: -9999rpx; left: -9999rpx; width: 600px; height: 1000px;"
+  ></canvas>
 </view>

@@ -1,17 +1,11 @@
 {
-  "pages": [
-    "pages/index/index"
-  ],
   "usingComponents": {
     "ec-canvas": "../../ec-canvas/ec-canvas"
   },
-  "window": {
-    "backgroundTextStyle": "light",
-    "navigationBarBackgroundColor": "#fff",
-    "navigationBarTitleText": "足迹点亮地图",
-    "navigationBarTextStyle": "black",
-    "navigationStyle": "custom"
-  },
+  "backgroundTextStyle": "light",
+  "navigationBarBackgroundColor": "#fff",
+  "navigationBarTitleText": "足迹地图",
+  "navigationBarTextStyle": "black",
   "permission": {
     "scope.userLocation": {
       "desc": "您的位置信息将用于地图定位"

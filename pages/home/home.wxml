@@ -16,25 +16,25 @@
       style="width: 100%; height: {{mapHeight}}px;">
     </map>
   </view>
-   <view class="action-buttons">
-    <button class="btn btn-primary" bindtap="generateShareImage">生成专属海报</button>
-  </view>
-   <view class="action-buttons">
-    <button class="btn btn-primary" bindtap="gomypage">城市列表</button>
-  </view>
   
+
+  <view class="poster_area" bindtap="generateShareImage"> 
+    <image src="../../images/photo_bg.png" mode="aspectFill" style="width: 80rpx; height: 65rpx; margin-right: 20rpx;  border: none;"  />
+    <span>生成专属海报</span> 
+  </view>
+
+  <view class="star_area">
+    <image src="../../images/star.png" mode="aspectFill" style="width: 60rpx; height: 60rpx;"/>
+    <span>山河万里，步履不停。您已走过 <span style="font-weight: 700; font-size: 36rpx; color: red;">{{visitedCount}}</span> 个城市</span>
+  </view>
+  <view class="arrow_area" bind:tap="golistpage">
+    <image src="../../images/arrow.png" mode="aspectFill" style="width: 50rpx; height: 50rpx;"/>
+    <span>继续探索 【查看城市列表】</span>
+  </view>
   <!-- 底部统计信息 -->
-  <view class="stats-panel">
-    <view class="stats-row">
-      <!-- 足迹点亮地图，回忆温暖时光。您已走过 XX 个城市，收藏了 XX 段故事。继续出发，书写下一章吧！ -->
+ <!-- 足迹点亮地图，回忆温暖时光。您已走过 XX 个城市，收藏了 XX 段故事。继续出发，书写下一章吧！ -->
       <!-- 山河万里，步履不停。您已走过 12 个城市。 -->
       <!-- 【分享我的地图】 【看看下一站去哪】 【查看旅行足迹】【继续探索】 -->
-      <view class="stat-item">
-        <text class="stat-number">{{visitedCount}}</text>
-        <text class="stat-label">已点亮城市</text>
-      </view>
-    </view>
-  </view>
   <view class="map-container" style="height: 40vh; z-index: -1; opacity: 0; transform: translateX(-100%);">
     <ec-canvas id="map-canvas" canvas-id="map-canvas" ec="{{ ec }}"></ec-canvas>
   </view>

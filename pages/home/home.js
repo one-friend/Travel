@@ -534,9 +534,9 @@ Page({
      
   },
 
-  gomypage(){
+  golistpage(){
      wx.navigateTo({
-      url: '/pages/my/my'
+      url: '/pages/cityList/cityList'
     })
   }
 

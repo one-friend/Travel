@@ -496,9 +496,9 @@ Page({
     wx.showLoading({
       title: '生成中',
     })
-    if(this.ecComponent) {
-      setTimeout(async () => {
-        try {
+    setTimeout(async () => {
+      try {
+        if(this.ecComponent) {
           const filePath = await createSharePoster({
             chartComponent: this.ecComponent,
             userInfo: {
@@ -514,16 +514,23 @@ Page({
           console.log('✅ 生成成功:', filePath);
           wx.hideLoading()
           wx.previewImage({ urls: [filePath] });
-        } catch (err) {
-          wx.hideLoading()
+        }else {
           wx.showToast({
-            title: '生成失败',
-            icon:'error'
+            title: '请重新生成',
+            icon:'none'
           })
-          console.error('❌ 生成失败:', err);
         }
-      }, 1500);
-    }
+        
+      } catch (err) {
+        wx.hideLoading()
+        wx.showToast({
+          title: '生成失败',
+          icon:'error'
+        })
+        console.error('❌ 生成失败:', err);
+      }
+    }, 1500);
+    
      
   },
 

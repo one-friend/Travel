@@ -49,7 +49,7 @@ function simplifyProvinceName(fullName) {
 
 // 判断是否为直辖市的辅助函数
 function isMunicipality(provinceName) {
-  const municipalities = ['北京市', '天津市', '上海市', '重庆市'];
+  const municipalities = ['北京市', '天津市', '上海市', '重庆市','香港特别行政区','澳门特别行政区','台湾省'];
   return municipalities.includes(provinceName);
 }
 Page({
@@ -81,7 +81,7 @@ Page({
     this.loadVisitedData()
     
     // 初始化地图高亮
-    // this.initMapHighlights(()=>{this.initChart()})
+    this.initMapHighlights(()=>{this.initChart()})
 
   },
 
@@ -116,7 +116,6 @@ Page({
   // 初始化默认数据（示例）
   initDefaultData: function() {
     const defaultRegions = this.convertVisitedCitiesToTargetFormat()
-    
     const formatRegions = defaultRegions.reduce((regions, reg) => {
       if(!reg.citys) {
         regions.push({
@@ -331,10 +330,8 @@ Page({
     const visitedCities = wx.getStorageSync('visitedCities') || {};
     // 完整的省份数据结构（使用您提供的数据）
     const citiesByProvince = this.data.citiesByProvince
-
     // 创建目标数据结构
     const targetData = [];
-    
     // 遍历所有省份
     citiesByProvince.forEach(province => {
       // 获取该省份下已访问的城市

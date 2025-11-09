@@ -4,10 +4,12 @@ Page({
   data: {
     citiesData: [],
     displayData: [],
+    zxs: [],
     searchText: '',
     visitedCount: 0,
     totalCount: 0,
-    visitedPercent: 0
+    visitedPercent: 0,
+    zxsVCount: 0
   },
 
   onLoad() {
@@ -26,10 +28,15 @@ Page({
       expanded: false,
       visitedCount: 0
     }));
-
+    const zxs = processedData.filter(item => item.provinceCode == "110000" || item.provinceCode == "120000" || item.provinceCode == "310000" || item.provinceCode == "500000" )
+    const zxsVCount = zxs.reduce((count,province)=>{
+      return Number(count) + Number(province.visitedCount)
+    },0)
     this.setData({
       citiesData: processedData,
-      displayData: processedData
+      displayData: processedData,
+      zxs: zxs,
+      zxsVCount
     });
 
     this.calculateTotalCount();
@@ -57,10 +64,15 @@ Page({
       });
       return { ...province, cities, visitedCount };
     });
-
+    const zxs = updatedData.filter(item => item.provinceCode == "110000" || item.provinceCode == "120000" || item.provinceCode == "310000" || item.provinceCode == "500000" )
+    const zxsVCount = zxs.reduce((count,province)=>{
+      return Number(count) + Number(province.visitedCount)
+    },0)
     this.setData({
       citiesData: updatedData,
-      displayData: updatedData
+      displayData: updatedData,
+      zxs: zxs,
+      zxsVCount
     });
     this.calculateStats();
   },

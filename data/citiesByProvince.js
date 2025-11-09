@@ -461,18 +461,6 @@ const citiesByProvince = [
     ],
   },
   {
-    province: '台湾省',
-    provinceCode: '710000',
-    cities: [
-      { name: '台北', visited: false },
-      { name: '高雄', visited: false },
-      { name: '台中', visited: false },
-      { name: '台南', visited: false },
-      { name: '新竹', visited: false },
-      { name: '嘉义', visited: false },
-    ],
-  },
-  {
     province: '内蒙古自治区',
     provinceCode: '150000',
     cities: [
@@ -492,7 +480,7 @@ const citiesByProvince = [
   },
   {
     province: '广西壮族自治区',
-    provinceCode: '',
+    provinceCode: '450000',
     cities: [
       { name: '南宁', visited: false },
       { name: '柳州', visited: false },
@@ -525,7 +513,7 @@ const citiesByProvince = [
   },
   {
     province: '宁夏回族自治区',
-    provinceCode: '',
+    provinceCode: '640000',
     cities: [
       { name: '银川', visited: false },
       { name: '石嘴山', visited: false },
@@ -536,7 +524,7 @@ const citiesByProvince = [
   },
   {
     province: '新疆维吾尔自治区',
-    provinceCode: '',
+    provinceCode: '650000',
     cities: [
       { name: '乌鲁木齐', visited: false },
       { name: '克拉玛依', visited: false },
@@ -566,6 +554,13 @@ const citiesByProvince = [
     provinceCode: '820000',
     cities: [
       { name: '澳门', visited: false },
+    ],
+  },
+  {
+    province: '台湾省',
+    provinceCode: '710000',
+    cities: [
+      { name: '台湾', visited: false },
     ],
   },
 ];

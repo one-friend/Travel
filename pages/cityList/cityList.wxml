@@ -14,12 +14,33 @@
   </view> -->
 
   <scroll-view class="city-list" scroll-y>
-    <view class="section" wx:for="{{displayData}}" wx:key="name">
+    <view class="section" >
       <view class="section-header">
+        <text class="section-title">直辖市 (已点亮{{zxsVCount}}/4）</text>
+      </view>
+      
+      <view class="cities-grid" >
+        <view 
+          class="city-item {{province.cities[0].visited ? 'visited' : ''}}" 
+          wx:for="{{zxs}}" 
+          wx:key="name"
+          wx:for-item="province"
+          bindtap="toggleCity"
+          data-province="{{province.provinceCode}}"
+          data-city="{{province.cities[0].name}}"
+        >
+          {{province.cities[0].name}}
+        </view>
+      </view>
+      
+      <view class="divider" wx:if="{{index < provinces.length - 1}}"></view>
+    </view>
+    <view class="section" wx:for="{{displayData}}" wx:for-index="index" wx:key="name">
+      <view class="section-header" wx:if="{{index != 0 && index != 1 && index != 2 && index != 3}}">
         <text class="section-title">{{item.province}}（已点亮{{item.visitedCount}}/{{item.cities.length}}）</text>
       </view>
       
-      <view class="cities-grid">
+      <view class="cities-grid" wx:if="{{index != 0 && index != 1 && index != 2 && index != 3}}">
         <view 
           class="city-item {{city.visited ? 'visited' : ''}}" 
           wx:for="{{item.cities}}" 

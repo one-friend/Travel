@@ -35,7 +35,7 @@
  <!-- 足迹点亮地图，回忆温暖时光。您已走过 XX 个城市，收藏了 XX 段故事。继续出发，书写下一章吧！ -->
       <!-- 山河万里，步履不停。您已走过 12 个城市。 -->
       <!-- 【分享我的地图】 【看看下一站去哪】 【查看旅行足迹】【继续探索】 -->
-  <view class="map-container" style="height: 40vh;">
+  <view class="map-container" style="height: 40vh; z-index: -1; opacity: 0; transform: translateX(-100%);">
     <ec-canvas id="map-canvas" canvas-id="map-canvas" ec="{{ ec }}"></ec-canvas>
   </view>
   <canvas 

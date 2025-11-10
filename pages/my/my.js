@@ -6,6 +6,11 @@ Page({
       nickName:'微信用户'
     },
     visitedCities: [],
+    maps: [
+      { name: '足迹1', id: 'map1' },
+      { name: '足迹2', id: 'map2' },
+      { name: '足迹3', id: 'map3' }
+    ],
   },
 
   onLoad() {
@@ -20,7 +25,10 @@ Page({
       .filter(key => data[key] === true)  // 过滤出值为 true 的城市
       .map(key => key.split('-')[1]);     // 提取城市名（按 "-" 分割，取第二部分）
   },
-
+  switchMap(e) {
+    const index = e.currentTarget.dataset.index;
+    this.setData({ currentMapIndex: index });
+  },
   chooseAvatar(e){
     let { userInfo } = this.data;
     userInfo.avatarUrl = e.detail.avatarUrl;

@@ -1,25 +1,34 @@
-<!--pages/my/my.wxml-->
+<!-- pages/my/my.wxml -->
 <view class="container">
   <!-- 头像和用户名 -->
   <view class="profile">
-    <button  open-type="chooseAvatar" class="avatar_btn" bindchooseavatar="chooseAvatar">
-      <image class="avatar" src="{{userInfo.avatarUrl}}" mode="widthFix"></image>
+    <button open-type="chooseAvatar" class="avatar_btn" bindchooseavatar="chooseAvatar">
+      <image class="avatar" src="{{userInfo.avatarUrl}}" mode="widthFix" />
     </button>
-    <input class="username" type="nickname" value="{{userInfo.nickName}}" bindchange="inputNickName" />
+    <input class="username" type="text" value="{{userInfo.nickName}}" bindinput="inputNickName" placeholder="请输入昵称" />
+    <text class="city-count">已点亮 {{visitedCities.length}} 个城市</text>
   </view>
 
-  <!-- 我的城市 -->
-  <!-- <view class="section">
-    <text class="section-title">已点亮的城市</text>
+  <!-- 地图切换 -->
+  <view class="map-switch">
+    <button wx:for="{{maps}}" wx:key="index" bindtap="switchMap" data-index="{{index}}" class="{{currentMapIndex===index?'active':''}}">
+      {{item.name}}
+    </button>
+  </view>
+
+
+  <!-- 足迹列表 -->
+  <view class="section">
+    <text class="section-title">足迹列表</text>
     <view class="city-list">
       <block wx:for="{{visitedCities}}" wx:key="index">
         <view class="city-item">{{item}}</view>
       </block>
     </view>
-  </view> -->
+  </view>
 
   <!-- 退出按钮 -->
-  <view class="section">
-    <!-- <button class="logout-button" bindtap="logout">退出登录</button> -->
+  <view class="section logout-section">
+    <button class="logout-button" bindtap="logout">退出登录</button>
   </view>
 </view>

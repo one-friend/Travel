@@ -1,79 +1,115 @@
-/* pages/my/my.wxss */
-/* 页面整体样式 */
 .container {
-  padding: 20px;
+  padding: 16px;
+  background-color: #f7f7f7;
+  min-height: 100vh;
 }
 
-/* 头像和用户名 */
 .profile {
   display: flex;
   align-items: center;
-  margin-bottom: 20px;
-}
-.avatar_btn {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  width: 60px;
-  height: 60px;
-  border: 1px solid #ccc;
-  border-radius: 50%;
-  margin-right: 10px;
-  position: relative;
-}
-.avatar {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  position: absolute;
-  left: 0;
-}
-.username {
-  font-size: 18px;
-  font-weight: bold;
+  gap: 12px;
+  margin-bottom: 16px;
 }
 
-/* 城市列表 */
-.section {
-  margin-bottom: 20px;
+.avatar_btn {
+  border: none;
+  padding: 0;
+  background: none;
 }
-.section-title {
+
+.avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+}
+
+.username {
+  flex: 1;
+  height: 36px;
+  padding: 0 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
   font-size: 16px;
-  color: #333;
-  margin-bottom: 10px;
 }
-.city-list {
+
+.city-count {
+  font-size: 14px;
+  color: #888;
+  margin-top: 4px;
+}
+
+.map-switch {
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+  justify-content: space-around;
+  margin: 16px 0;
 }
-.city-item {
-  background-color: #f0f0f0;
-  padding: 8px 12px;
-  border-radius: 12px;
+
+.map-switch button {
+  flex: 1;
+  margin: 0 4px;
+  padding: 8px 0;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  color: #333;
   font-size: 14px;
 }
 
-/* 设置按钮 */
-.settings {
-  display: flex;
-  flex-direction: column;
-}
-.setting-button {
-  margin: 5px 0;
-  padding: 10px;
+.map-switch button.active {
   background-color: #007aff;
-  color: white;
-  border-radius: 5px;
+  color: #fff;
+  border-color: #007aff;
+}
+
+.map-container {
+  height: 100px;
+  border-radius: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 16px;
+  background-color: #e5e5e5;
+}
+
+.map-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #333;
+}
+
+.section {
+  margin-bottom: 16px;
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.city-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.city-item {
+  background-color: #fff;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  border: 1px solid #ddd;
+}
+
+.logout-section {
   text-align: center;
 }
 
-/* 退出按钮 */
 .logout-button {
-  margin-top: 20px;
-  width: 100%;
-  padding: 12px;
+  padding: 10px 20px;
+  border-radius: 8px;
   background-color: #ff3b30;
-  color: white;
-  border-radius: 5px;
+  color: #fff;
+  border: none;
+  font-size: 16px;
 }

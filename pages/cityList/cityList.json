@@ -1,4 +1,6 @@
 {
-  "usingComponents": {},
+  "usingComponents": {
+    "info-modal": "/components/info-modal/info-modal"
+  },
   "navigationBarTitleText": "城市列表"
 }

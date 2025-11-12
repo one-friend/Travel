@@ -1,10 +1,4 @@
 <view class="container">
-  <!-- 顶部信息栏 -->
-  <!-- <view class="header">
-    <view class="time">{{currentTime}}</view>
-    <view class="title">串联轨迹，编织足迹故事</view>
-  </view> -->
-  
   <!-- 地图区域 - 设置固定高度避免尺寸过大 -->
   <view class="map-container">
     <map 
@@ -32,9 +26,6 @@
     <span>继续探索 【查看城市列表】</span>
   </view>
   <!-- 底部统计信息 -->
- <!-- 足迹点亮地图，回忆温暖时光。您已走过 XX 个城市，收藏了 XX 段故事。继续出发，书写下一章吧！ -->
-      <!-- 山河万里，步履不停。您已走过 12 个城市。 -->
-      <!-- 【分享我的地图】 【看看下一站去哪】 【查看旅行足迹】【继续探索】 -->
   <view class="map-container" style="height: 40vh; z-index: -1; opacity: 0; transform: translateX(-100%);">
     <ec-canvas id="map-canvas" canvas-id="map-canvas" ec="{{ ec }}"></ec-canvas>
   </view>

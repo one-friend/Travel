@@ -1,7 +1,4 @@
 <view class="container">
-  <!-- 头部统计信息 -->
- <!-- <text class="stat-number">{{visitedCount}}</text> -->
-
   <!-- 搜索框 -->
   <!-- <view class="search-box">
     <input 
@@ -57,4 +54,6 @@
       <view class="divider" wx:if="{{index < provinces.length - 1}}"></view>
     </view>
   </scroll-view>
+
+  <info-modal id="infoModal" bind:confirm="onModalConfirm" bind:cancel="onModalCancel" title="城市点亮信息" />
 </view>

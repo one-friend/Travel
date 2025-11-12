@@ -1,6 +1,0 @@
-<!-- index.wxml -->
-<view class="container">
-  <view class="map-container">
-    <ec-canvas id="map-canvas" canvas-id="map-canvas" ec="{{ ec }}"></ec-canvas>
-  </view>
-</view>

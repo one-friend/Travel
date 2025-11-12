@@ -1,0 +1,39 @@
+<view wx:if="{{visible}}" class="modal-wrap" catchtap="onMaskTap">
+  <view class="modal-panel" animation="{{panelAnim}}" catchtap="noop">
+    <view class="modal-header">
+      <view class="title">{{title}}</view>
+      <button class="close-btn" bindtap="onCancel">×</button>
+    </view>
+
+    <view class="modal-body">
+      <view class="row">
+        <view class="label">点亮</view>
+        <switch checked="{{form.on}}" bindchange="onToggleChange" />
+      </view>
+
+      <view class="row">
+        <view class="label">日期</view>
+        <picker mode="date" value="{{form.date}}" start="2000-01-01" end="2099-12-31" bindchange="onDateChange">
+          <view class="picker-value">{{form.date || '请选择日期'}}</view>
+        </picker>
+      </view>
+
+      <!-- <view class="row">
+        <view class="label">时间</view>
+        <picker mode="time" value="{{form.time}}" bindchange="onTimeChange">
+          <view class="picker-value">{{form.time || '请选择时间'}}</view>
+        </picker>
+      </view> -->
+
+      <view class="row textarea-row">
+        <view class="label">备注</view>
+        <textarea class="notes" placeholder="写点备注..." value="{{form.note}}" bindinput="onNoteInput" maxlength="300" />
+      </view>
+    </view>
+
+    <view class="modal-footer">
+      <button class="btn btn-cancel" bindtap="onCancel">取消</button>
+      <button class="btn btn-confirm" bindtap="onConfirm">保存</button>
+    </view>
+  </view>
+</view>

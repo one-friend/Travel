@@ -9,7 +9,9 @@ Page({
     visitedCount: 0,
     totalCount: 0,
     visitedPercent: 0,
-    zxsVCount: 0
+    zxsVCount: 0,
+
+    currentCity: null
   },
 
   onLoad() {
@@ -125,6 +127,62 @@ Page({
       icon: 'success',
       duration: 1000
     });
+  },
+
+  onCityTap(e) {
+    const city = e.currentTarget.dataset.city;
+    this.setData({ currentCity: city });
+
+    // 通过组件实例 open 并传初始数据
+    const modal = this.selectComponent('#infoModal');
+    modal.open({
+      on: !!city.lit,
+      // 填默认日期为今天
+      date: this._todayDate(),
+      time: this._nowTime(),
+      note: city.note || ''
+    });
+  },
+
+  onModalCancel() {
+    console.log('用户取消');
+  },
+
+  onModalConfirm(e) {
+    const detail = e.detail; // { on, date, time, datetime, note }
+    console.log('保存结果：', detail);
+
+    // 保存到页面数据或云端（示例：更新 cities 数组）
+    const city = this.data.currentCity;
+    if (!city) return;
+    const cities = this.data.cities.map(c => {
+      if (c.id === city.id) {
+        return Object.assign({}, c, {
+          lit: detail.on,
+          note: detail.note,
+          lastTime: detail.datetime
+        });
+      }
+      return c;
+    });
+    this.setData({ cities });
+
+    // 同步保存到云或后端的代码放这里
+  },
+
+  _todayDate() {
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth()+1).padStart(2,'0');
+    const day = String(d.getDate()).padStart(2,'0');
+    return `${y}-${m}-${day}`;
+  },
+
+  _nowTime() {
+    const d = new Date();
+    const h = String(d.getHours()).padStart(2,'0');
+    const m = String(d.getMinutes()).padStart(2,'0');
+    return `${h}:${m}`;
   },
 
   // 搜索输入处理

@@ -83,7 +83,5 @@ Page({
   // 退出登录
   logout() {
     wx.removeStorageSync('userInfo');
-    wx.removeStorageSync('visitedCities');
-    wx.reLaunch({ url: '/pages/login/login' });
   }
 });

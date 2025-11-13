@@ -1,9 +1,9 @@
 <!-- pages/my/my.wxml -->
 <view class="container">
-  <!-- 头像和用户名 -->
+  <!-- 用户信息区 -->
   <view class="profile">
-    <button open-type="chooseAvatar" class="avatar_btn" bindchooseavatar="chooseAvatar">
-      <image class="avatar" src="{{userInfo.avatarUrl}}" mode="widthFix" />
+    <button open-type="chooseAvatar" class="avatar-btn" bindchooseavatar="chooseAvatar">
+      <image class="avatar" src="{{userInfo.avatarUrl}}" mode="aspectFill" />
     </button>
     <input class="username" type="text" value="{{userInfo.nickName}}" bindinput="inputNickName" placeholder="请输入昵称" />
     <text class="city-count">已点亮 {{visitedCities.length}} 个城市</text>
@@ -11,24 +11,51 @@
 
   <!-- 地图切换 -->
   <view class="map-switch">
-    <button wx:for="{{maps}}" wx:key="index" bindtap="switchMap" data-index="{{index}}" class="{{currentMapIndex===index?'active':''}}">
+    <button wx:for="{{maps}}" wx:key="index" bindtap="switchMap" data-index="{{index}}" class="map-btn {{currentMapIndex===index?'active':''}}">
       {{item.name}}
     </button>
   </view>
 
-
   <!-- 足迹列表 -->
   <view class="section">
-    <text class="section-title">足迹列表</text>
+    <text class="section-title">我的足迹</text>
     <view class="city-list">
       <block wx:for="{{visitedCities}}" wx:key="index">
-        <view class="city-item">{{item}}</view>
+        <view class="city-item" bindtap="showCityDetail" data-city="{{item}}">
+          <text class="city-name">{{item.name}}</text>
+          <text class="city-time">{{item.date || item.datetime}}</text>
+        </view>
       </block>
+      <view wx:if="{{visitedCities.length === 0}}" class="empty-tip">还没有点亮任何城市哦～</view>
     </view>
   </view>
 
   <!-- 退出按钮 -->
-  <view class="section logout-section">
+  <view class="logout-section">
     <button class="logout-button" bindtap="logout">退出登录</button>
+  </view>
+
+  <!-- 弹层 -->
+  <view wx:if="{{showDetailModal}}" class="popup-mask" bindtap="closePopup">
+    <view class="popup" catchtap="stopTap">
+      <text class="popup-title">{{currentCity.name}}</text>
+<!-- 
+      <view class="popup-field">
+        <text class="label">点亮状态：</text>
+        <switch checked="{{isLightOn}}" bindchange="toggleLight"></switch>
+      </view> -->
+
+      <view class="popup-field">
+        <text class="label">点亮时间：</text>
+        <text class="value">{{currentCity.date || currentCity.datetime}}</text>
+      </view>
+
+      <view class="popup-field remark">
+        <text class="label">{{currentCity.note}}</text>
+        <!-- <textarea placeholder="输入你的旅行感想..." value="{{remark}}" bindinput="onRemarkInput" maxlength="100"></textarea> -->
+      </view>
+
+      <!-- <button class="popup-save" bindtap="saveCityInfo">保存</button> -->
+    </view>
   </view>
 </view>

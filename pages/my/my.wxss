@@ -1,123 +1,238 @@
-.container {
-  padding: 16px;
-  background-color: #f7f7f7;
+page {
+  background: linear-gradient(180deg, #e0f0ff 0%, #ffffff 65%);
   min-height: 100vh;
+  font-family: 'PingFang SC', 'Helvetica Neue', sans-serif;
+  color: #333;
 }
 
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60rpx 40rpx 100rpx;
+}
+
+/* ===== 个人资料区域 ===== */
 .profile {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 16px;
+  margin-bottom: 60rpx;
 }
 
 .avatar_btn {
   border: none;
+  background: none;
   padding: 0;
-  background: none;
-  width: 60px;
-  height: 60px;
-  border: 1px solid #ccc;
-  border-radius: 50%;
-  position: relative;
-  box-sizing: border-box;
-  background: none;
-  margin: 0;
 }
 
 .avatar {
-  width: 60px;
-  height: 60px;
+  width: 160rpx;
+  height: 160rpx;
   border-radius: 50%;
+  border: 4rpx solid #fff;
+  box-shadow: 0 6rpx 18rpx rgba(0, 0, 0, 0.1);
 }
 
 .username {
-  flex: 1;
-  height: 36px;
-  padding: 0 8px;
-  /* border: 1px solid #ccc; */
-  border-radius: 6px;
-  font-size: 16px;
+  margin-top: 24rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+  text-align: center;
+  border: none;
+  background: none;
+  color: #1f2d3d;
 }
 
 .city-count {
-  font-size: 14px;
-  color: #888;
-  margin-top: 4px;
+  margin-top: 10rpx;
+  font-size: 26rpx;
+  color: #607d8b;
 }
 
+/* ===== 地图切换 ===== */
 .map-switch {
   display: flex;
-  justify-content: space-around;
-  margin: 16px 0;
+  justify-content: center;
+  gap: 20rpx;
+  margin-bottom: 60rpx;
 }
 
 .map-switch button {
-  flex: 1;
-  margin: 0 4px;
-  padding: 8px 0;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  background-color: #fff;
-  color: #333;
-  font-size: 14px;
+  background-color: #e8f1ff;
+  border-radius: 30rpx;
+  padding: 14rpx 40rpx;
+  font-size: 28rpx;
+  color: #1e4fff;
+  border: 2rpx solid transparent;
+  transition: all 0.3s ease;
+  box-shadow: 0 4rpx 10rpx rgba(0, 0, 0, 0.05);
 }
 
 .map-switch button.active {
-  background-color: #007aff;
+  background: linear-gradient(135deg, #4a90e2, #3d6aff);
   color: #fff;
-  border-color: #007aff;
+  box-shadow: 0 8rpx 16rpx rgba(61, 106, 255, 0.3);
+  border: none;
 }
 
-.map-container {
-  height: 100px;
-  border-radius: 12px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 16px;
-  background-color: #e5e5e5;
-}
-
-.map-title {
-  font-size: 20px;
-  font-weight: bold;
-  color: #333;
-}
-
+/* ===== 足迹卡片 ===== */
 .section {
-  margin-bottom: 16px;
+  width: 100%;
+  background: #fff;
+  border-radius: 24rpx;
+  box-shadow: 0 8rpx 20rpx rgba(0, 0, 0, 0.06);
+  padding: 40rpx;
+  margin-bottom: 40rpx;
 }
 
 .section-title {
-  font-size: 16px;
-  font-weight: bold;
-  margin-bottom: 8px;
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #222;
+  margin-bottom: 30rpx;
+  display: block;
 }
 
 .city-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 20rpx;
 }
 
 .city-item {
-  background-color: #fff;
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-size: 14px;
-  border: 1px solid #ddd;
+  background: #f2f6ff;
+  color: #3d6aff;
+  border-radius: 30rpx;
+  padding: 18rpx 32rpx;
+  font-size: 28rpx;
+  box-shadow: 0 4rpx 10rpx rgba(0, 0, 0, 0.05);
+  transition: all 0.2s;
 }
 
+.city-item:active {
+  transform: scale(0.96);
+  background: #e4ecff;
+  box-shadow: 0 6rpx 12rpx rgba(61, 106, 255, 0.25);
+}
+
+/* ===== 退出登录按钮 ===== */
 .logout-section {
-  text-align: center;
+  margin-top: 30rpx;
+  width: 100%;
+  display: flex;
+  justify-content: center;
 }
 
 .logout-button {
-  padding: 10px 20px;
-  border-radius: 8px;
-  background-color: #ff3b30;
+  width: 80%;
+  background: linear-gradient(135deg, #ff7f50, #ff4f4f);
   color: #fff;
   border: none;
-  font-size: 16px;
+  border-radius: 40rpx;
+  padding: 26rpx 0;
+  font-size: 30rpx;
+  font-weight: 600;
+  text-align: center;
+  box-shadow: 0 8rpx 16rpx rgba(255, 79, 79, 0.25);
+  transition: all 0.25s ease;
+}
+
+.logout-button:active {
+  transform: scale(0.97);
+  opacity: 0.9;
+}
+
+/* ===== 弹层 ===== */
+.popup-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99;
+}
+
+.popup {
+  width: 80%;
+  background: #ffffff;
+  border-radius: 32rpx;
+  padding: 50rpx 40rpx;
+  box-shadow: 0 12rpx 32rpx rgba(0, 0, 0, 0.12);
+  animation: popup-show 0.25s ease;
+}
+
+@keyframes popup-show {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.popup-title {
+  font-size: 36rpx;
+  font-weight: 700;
+  text-align: center;
+  color: #2c3e50;
+  margin-bottom: 40rpx;
+}
+
+.popup-field {
+  display: flex;
+  align-items: center;
+  margin-bottom: 30rpx;
+}
+
+.label {
+  font-size: 28rpx;
+  color: #666;
+  min-width: 140rpx;
+}
+
+.value {
+  font-size: 28rpx;
+  color: #333;
+}
+
+.popup-field.remark {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.popup-field textarea {
+  width: 100%;
+  min-height: 120rpx;
+  background: #f8faff;
+  border-radius: 16rpx;
+  padding: 20rpx;
+  font-size: 28rpx;
+  color: #333;
+  margin-top: 10rpx;
+  box-shadow: inset 0 0 8rpx rgba(0, 0, 0, 0.05);
+}
+
+.popup-save {
+  width: 100%;
+  background: linear-gradient(135deg, #4a90e2, #3d6aff);
+  color: #fff;
+  border-radius: 40rpx;
+  padding: 24rpx 0;
+  font-size: 30rpx;
+  font-weight: 600;
+  text-align: center;
+  box-shadow: 0 8rpx 16rpx rgba(61, 106, 255, 0.3);
+  transition: all 0.2s;
+  margin-top: 20rpx;
+}
+
+.popup-save:active {
+  transform: scale(0.97);
 }

@@ -2,7 +2,6 @@
   <view class="modal-panel" animation="{{panelAnim}}" catchtap="noop">
     <view class="modal-header">
       <view class="title">{{title}}</view>
-      <button class="close-btn" bindtap="onCancel">×</button>
     </view>
 
     <view class="modal-body">

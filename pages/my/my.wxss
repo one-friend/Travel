@@ -20,10 +20,14 @@ page {
   margin-bottom: 60rpx;
 }
 
-.avatar_btn {
+.avatar-btn {
   border: none;
   background: none;
   padding: 0;
+  margin: 0;
+  width: 160rpx;
+  height: 160rpx;
+  box-sizing: border-box;
 }
 
 .avatar {
@@ -32,6 +36,7 @@ page {
   border-radius: 50%;
   border: 4rpx solid #fff;
   box-shadow: 0 6rpx 18rpx rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
 }
 
 .username {

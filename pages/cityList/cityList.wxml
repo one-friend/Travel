@@ -1,15 +1,4 @@
 <view class="container">
-  <!-- 搜索框 -->
-  <!-- <view class="search-box">
-    <input 
-      class="search-input" 
-      placeholder="搜索省份或城市..." 
-      bindinput="onSearchInput"
-      value="{{searchText}}"
-    />
-    <text class="search-icon">🔍</text>
-  </view> -->
-
   <scroll-view class="city-list" scroll-y>
     <view class="section" >
       <view class="section-header">
@@ -22,9 +11,9 @@
           wx:for="{{zxs}}" 
           wx:key="name"
           wx:for-item="province"
-          bindtap="toggleCity"
+          bindtap="onCityTap"
           data-province="{{province.provinceCode}}"
-          data-city="{{province.cities[0].name}}"
+          data-city="{{province.cities[0]}}"
         >
           {{province.cities[0].name}}
         </view>
@@ -43,9 +32,9 @@
           wx:for="{{item.cities}}" 
           wx:key="name"
           wx:for-item="city"
-          bindtap="toggleCity"
+          bindtap="onCityTap"
           data-province="{{item.provinceCode}}"
-          data-city="{{city.name}}"
+          data-city="{{city}}"
         >
           {{city.name}}
         </view>

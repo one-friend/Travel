@@ -22,7 +22,7 @@ Page({
   },
   getCitiesWithTrueValue(data) {
     return Object.keys(data)
-      .filter(key => data[key] === true)  // 过滤出值为 true 的城市
+      .filter(key => data[key]?.on === true)  // 过滤出值为 true 的城市
       .map(key => key.split('-')[1]);     // 提取城市名（按 "-" 分割，取第二部分）
   },
   switchMap(e) {

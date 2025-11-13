@@ -337,7 +337,7 @@ Page({
       // 获取该省份下已访问的城市
       const visitedCitiesInProvince = province.cities.filter(city => {
         const cityKey = `${province.provinceCode}-${city.name}`;
-        return visitedCities[cityKey] === true;
+        return visitedCities[cityKey]?.on === true;
       });
       
       // 如果该省份有已访问的城市，或者该省份是直辖市且已访问

@@ -11,14 +11,19 @@
 
   <!-- 地图切换 -->
   <view class="map-switch">
-    <button wx:for="{{maps}}" wx:key="index" bindtap="switchMap" data-index="{{index}}" class="map-btn {{currentMapIndex===index?'active':''}}">
-      {{item.name}}
-    </button>
+    <view wx:for="{{maps}}" wx:key="index" class="map-item">
+      <button bindtap="switchMap" data-index="{{index}}" class="map-btn {{currentMapIndex===index?'active':''}}">
+        {{item.name}}
+      </button>
+      <button class="rename-btn" bindtap="showRenameModal" data-index="{{index}}">✎</button>
+    </view>
+    <!-- 创建新足迹按钮 -->
+    <button class="map-btn create-btn" bindtap="showCreateModal">+ 新建</button>
   </view>
 
   <!-- 足迹列表 -->
   <view class="section">
-    <text class="section-title">我的足迹</text>
+    <text class="section-title">我的足迹 - {{currentMapName}}</text>
     <view class="city-list">
       <block wx:for="{{visitedCities}}" wx:key="index">
         <view class="city-item" bindtap="showCityDetail" data-city="{{item}}">
@@ -35,15 +40,10 @@
     <button class="logout-button" bindtap="logout">退出登录</button>
   </view>
 
-  <!-- 弹层 -->
+  <!-- 城市详情弹层 -->
   <view wx:if="{{showDetailModal}}" class="popup-mask" bindtap="closePopup">
     <view class="popup" catchtap="stopTap">
       <text class="popup-title">{{currentCity.name}}</text>
-<!-- 
-      <view class="popup-field">
-        <text class="label">点亮状态：</text>
-        <switch checked="{{isLightOn}}" bindchange="toggleLight"></switch>
-      </view> -->
 
       <view class="popup-field">
         <text class="label">点亮时间：</text>
@@ -52,10 +52,41 @@
 
       <view class="popup-field remark">
         <text class="label">{{currentCity.note}}</text>
-        <!-- <textarea placeholder="输入你的旅行感想..." value="{{remark}}" bindinput="onRemarkInput" maxlength="100"></textarea> -->
+      </view>
+    </view>
+  </view>
+
+  <!-- 创建足迹弹层 -->
+  <view wx:if="{{showCreateModal}}" class="popup-mask" bindtap="closeCreateModal">
+    <view class="popup" catchtap="stopTap">
+      <text class="popup-title">创建新足迹</text>
+      
+      <view class="popup-field">
+        <text class="label">足迹名称：</text>
+        <input class="create-input" value="{{newMapName}}" placeholder="请输入足迹名称" bindinput="onNewMapNameInput" maxlength="10" />
       </view>
 
-      <!-- <button class="popup-save" bindtap="saveCityInfo">保存</button> -->
+      <view class="popup-buttons">
+        <button class="popup-cancel" bindtap="closeCreateModal">取消</button>
+        <button class="popup-save" bindtap="confirmCreateMap">创建</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 重命名弹层 -->
+  <view wx:if="{{showRenameModal}}" class="popup-mask" bindtap="closeRenameModal">
+    <view class="popup" catchtap="stopTap">
+      <text class="popup-title">重命名足迹</text>
+      
+      <view class="popup-field">
+        <text class="label">名称：</text>
+        <input class="rename-input" value="{{renameText}}" placeholder="请输入新名称" bindinput="onRenameInput" maxlength="10" />
+      </view>
+
+      <view class="popup-buttons">
+        <button class="popup-cancel" bindtap="closeRenameModal">取消</button>
+        <button class="popup-save" bindtap="confirmRename">保存</button>
+      </view>
     </view>
   </view>
 </view>

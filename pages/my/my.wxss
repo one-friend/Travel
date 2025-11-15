@@ -245,3 +245,153 @@ page {
 wx-button::after{
   border: none;
 }
+/* 在原有CSS基础上添加以下样式 */
+
+/* 地图切换项容器 */
+.map-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* 重命名按钮 */
+.rename-btn {
+  position: absolute;
+  right: -20rpx;
+  top: 0rpx;
+  width: 30rpx;
+  height: 30rpx;
+  border: none;
+  background: unset !important;
+  color: #ff6b6b !important;
+  border-radius: 50%;
+  font-size: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  z-index: 2;
+  box-shadow: unset !important;
+}
+
+/* 重命名输入框 */
+.rename-input {
+  flex: 1;
+  background: #f8faff;
+  border-radius: 16rpx;
+  padding: 20rpx;
+  font-size: 28rpx;
+  color: #333;
+  margin-left: 20rpx;
+  box-shadow: inset 0 0 8rpx rgba(0, 0, 0, 0.05);
+}
+
+/* 取消按钮 */
+.popup-cancel {
+  width: 100%;
+  background: #f0f0f0;
+  color: #666;
+  border-radius: 40rpx;
+  padding: 24rpx 0;
+  font-size: 30rpx;
+  font-weight: 600;
+  text-align: center;
+  margin-top: 20rpx;
+  border: none;
+}
+
+.popup-cancel:active {
+  background: #e0e0e0;
+}
+
+/* 空状态提示 */
+.empty-tip {
+  text-align: center;
+  color: #999;
+  font-size: 28rpx;
+  padding: 60rpx 0;
+  width: 100%;
+}
+
+
+/* 在原有CSS基础上添加以下样式 */
+
+/* 创建足迹按钮 */
+.create-btn {
+  background: linear-gradient(135deg, #ff7f50, #ff6b6b) !important;
+  color: #fff !important;
+  border: none !important;
+}
+
+.create-btn:active {
+  background: linear-gradient(135deg, #ff6b47, #ff5252) !important;
+  transform: scale(0.95);
+}
+
+/* 创建输入框 */
+.create-input {
+  flex: 1;
+  background: #f8faff;
+  border-radius: 16rpx;
+  padding: 20rpx;
+  font-size: 28rpx;
+  color: #333;
+  margin-left: 20rpx;
+  box-shadow: inset 0 0 8rpx rgba(0, 0, 0, 0.05);
+  border: 2rpx solid #e0e0e0;
+}
+
+.create-input:focus {
+  border-color: #4a90e2;
+}
+
+/* 弹层按钮布局 */
+.popup-buttons {
+  display: flex;
+  gap: 20rpx;
+  margin-top: 40rpx;
+}
+
+.popup-cancel {
+  flex: 1;
+  background: #f0f0f0;
+  color: #666;
+  border-radius: 40rpx;
+  padding: 24rpx 0;
+  font-size: 30rpx;
+  font-weight: 600;
+  text-align: center;
+  border: none;
+}
+
+.popup-cancel:active {
+  background: #e0e0e0;
+  transform: scale(0.98);
+}
+
+.popup-save {
+  flex: 1;
+  background: linear-gradient(135deg, #4a90e2, #3d6aff);
+  color: #fff;
+  border-radius: 40rpx;
+  padding: 24rpx 0;
+  font-size: 30rpx;
+  font-weight: 600;
+  text-align: center;
+  box-shadow: 0 8rpx 16rpx rgba(61, 106, 255, 0.3);
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.popup-save:active {
+  transform: scale(0.98);
+}
+
+/* 空状态提示 */
+.empty-tip {
+  text-align: center;
+  color: #999;
+  font-size: 28rpx;
+  padding: 60rpx 0;
+  width: 100%;
+}

@@ -44,5 +44,5 @@
     </view>
   </scroll-view>
 
-  <info-modal id="infoModal" bind:confirm="onModalConfirm" bind:cancel="onModalCancel" title="城市点亮信息" />
+  <info-modal id="infoModal" bind:confirm="onModalConfirm" bind:cancel="onModalCancel" title="{{currentCity.name}}" />
 </view>

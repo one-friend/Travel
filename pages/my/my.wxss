@@ -241,3 +241,7 @@ page {
 .popup-save:active {
   transform: scale(0.97);
 }
+
+wx-button::after{
+  border: none;
+}

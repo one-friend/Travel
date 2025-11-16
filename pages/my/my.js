@@ -29,15 +29,15 @@ Page({
     
     // 初始化每个足迹的数据
     this.initializeMapsData(maps);
-    
-    const currentMapId = maps[this.data.currentMapIndex].id;
+    const currentMapId = wx.getStorageSync('currentMapId') || maps[this.data.currentMapIndex].id;
     const visitedCities = wx.getStorageSync(`visitedCities_${currentMapId}`) || {};
     
     this.setData({
       userInfo,
       maps,
       currentMapName: maps[this.data.currentMapIndex].name,
-      visitedCities: this._parseVisitedCities(visitedCities)
+      visitedCities: this._parseVisitedCities(visitedCities),
+      currentMapIndex: maps.findIndex(item => item.id === currentMapId)
     });
   },
 
@@ -72,7 +72,7 @@ Page({
     
     // 加载新足迹的数据
     const visitedCities = wx.getStorageSync(`visitedCities_${currentMapId}`) || {};
-    
+    wx.setStorageSync('currentMapId', currentMapId)
     this.setData({
       currentMapIndex: index,
       currentMapName: this.data.maps[index].name,

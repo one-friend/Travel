@@ -77,14 +77,14 @@ Page({
     // 计算合适的地图高度
     this.calculateMapHeight()
     
+  },
+  onShow: function() {
     // 加载已访问数据
     this.loadVisitedData()
     
     // 初始化地图高亮
     this.initMapHighlights(()=>{this.initChart()})
-
   },
-
   // 计算合适的地图高度
   calculateMapHeight: function() {
     const systemInfo = wx.getSystemInfoSync()
@@ -326,8 +326,10 @@ Page({
 
   // 将本地存储数据转换为目标数据结构的方法
   convertVisitedCitiesToTargetFormat: function() {
+    //从本地存储获取当前访问的列表id
+    const currentMapId = wx.getStorageSync('currentMapId') || 'map1';
     // 从本地存储获取已访问的城市数据
-    const visitedCities = wx.getStorageSync('visitedCities') || {};
+    const visitedCities = wx.getStorageSync(`visitedCities_${currentMapId}`) || {};
     // 完整的省份数据结构（使用您提供的数据）
     const citiesByProvince = this.data.citiesByProvince
     // 创建目标数据结构

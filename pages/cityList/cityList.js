@@ -39,7 +39,10 @@ Page({
 
   /** 统一刷新展示数据（加载 visited 状态 + 统计） */
   refreshData() {
-    const visitedCities = wx.getStorageSync('visitedCities') || {};
+    //从本地存储获取当前访问的列表id
+    const currentMapId = wx.getStorageSync('currentMapId') || 'map1';
+    // 从本地存储获取已访问的城市数据
+    const visitedCities = wx.getStorageSync(`visitedCities_${currentMapId}`) || {};
     const updatedData = this.data.citiesData.map(province => {
       let visitedCount = 0;
       const cities = province.cities.map(city => {
@@ -105,10 +108,14 @@ Page({
     const detail = e.detail; // { on, date, time, datetime, note }
     const city = this.data.currentCity;
     if (!city) return;
+    //从本地存储获取当前访问的列表id
+    const currentMapId = wx.getStorageSync('currentMapId') || 'map1';
+    // 从本地存储获取已访问的城市数据
+    const visitedCities = wx.getStorageSync(`visitedCities_${currentMapId}`) || {};
 
-    const visitedCities = wx.getStorageSync('visitedCities') || {};
     visitedCities[city.key] = detail;
-    wx.setStorageSync('visitedCities', visitedCities);
+
+    wx.setStorageSync(`visitedCities_${currentMapId}`, visitedCities);
 
     // 更新展示数据
     this.refreshData();

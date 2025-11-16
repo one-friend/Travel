@@ -23,7 +23,7 @@ Page({
     renamingIndex: -1
   },
 
-  onLoad() {
+  onShow() {
     const userInfo = wx.getStorageSync('userInfo') || this.data.userInfo;
     const maps = wx.getStorageSync('maps') || this.data.maps;
     
@@ -267,6 +267,6 @@ Page({
 
   // 退出登录
   logout() {
-    wx.removeStorageSync('userInfo');
+    // wx.removeStorageSync('userInfo');
   }
 });

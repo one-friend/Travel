@@ -26,27 +26,62 @@ Page({
   onShow() {
     const userInfo = wx.getStorageSync('userInfo') || this.data.userInfo;
     const maps = wx.getStorageSync('maps') || this.data.maps;
-    
+
     // 初始化每个足迹的数据
     this.initializeMapsData(maps);
     const currentMapId = wx.getStorageSync('currentMapId') || maps[this.data.currentMapIndex].id;
-    const visitedCities = wx.getStorageSync(`visitedCities_${currentMapId}`) || {};
     
+    // 从云数据库获取已访问城市数据
+    this.getVisitedCities(currentMapId);
+
     this.setData({
       userInfo,
       maps,
       currentMapName: maps[this.data.currentMapIndex].name,
-      visitedCities: this._parseVisitedCities(visitedCities),
       currentMapIndex: maps.findIndex(item => item.id === currentMapId)
+    });
+  },
+
+  // 从云数据库获取已访问城市数据
+  getVisitedCities(mapId) {
+    const db = wx.cloud.database();
+    db.collection('visitedCities').where({
+      mapId: mapId
+    }).get({
+      success: res => {
+        const visitedCities = res.data[0] ? res.data[0].cities : {};
+        this.setData({
+          visitedCities: this._parseVisitedCities(visitedCities)
+        });
+      },
+      fail: err => {
+        console.error('获取已访问城市失败', err);
+      }
     });
   },
 
   // 初始化足迹数据
   initializeMapsData(maps) {
     maps.forEach(map => {
-      const mapData = wx.getStorageSync(`visitedCities_${map.id}`);
-      if (!mapData) {
-        wx.setStorageSync(`visitedCities_${map.id}`, {});
+      this.checkMapData(map.id);
+    });
+  },
+
+  // 检查足迹是否有数据，如果没有则创建空数据
+  checkMapData(mapId) {
+    const db = wx.cloud.database();
+    db.collection('visitedCities').where({
+      mapId: mapId
+    }).get({
+      success: res => {
+        if (res.data.length === 0) {
+          db.collection('visitedCities').add({
+            data: {
+              mapId: mapId,
+              cities: {}
+            }
+          });
+        }
       }
     });
   },
@@ -70,17 +105,16 @@ Page({
     const index = e.currentTarget.dataset.index;
     const currentMapId = this.data.maps[index].id;
     
-    // 加载新足迹的数据
-    const visitedCities = wx.getStorageSync(`visitedCities_${currentMapId}`) || {};
+    // 从云数据库获取新足迹的数据
+    this.getVisitedCities(currentMapId);
     wx.setStorageSync('currentMapId', currentMapId)
     this.setData({
       currentMapIndex: index,
-      currentMapName: this.data.maps[index].name,
-      visitedCities: this._parseVisitedCities(visitedCities)
+      currentMapName: this.data.maps[index].name
     });
   },
 
-  // 显示创建足迹弹层
+  // 创建新足迹
   showCreateModal() {
     this.setData({
       showCreateModal: true,
@@ -134,22 +168,36 @@ Page({
 
     // 更新maps数据
     const newMaps = [...maps, newMap];
-    
-    // 初始化新足迹的数据存储
-    wx.setStorageSync(`visitedCities_${newMapId}`, {});
 
-    this.setData({
-      maps: newMaps,
-      showCreateModal: false,
-      newMapName: ''
-    });
+    // 将新足迹数据保存到云数据库
+    const db = wx.cloud.database();
+    db.collection('visitedCities').add({
+      data: {
+        mapId: newMapId,
+        cities: {}
+      },
+      success: () => {
+        this.setData({
+          maps: newMaps,
+          showCreateModal: false,
+          newMapName: ''
+        });
 
-    // 保存到本地存储
-    wx.setStorageSync('maps', newMaps);
-    
-    wx.showToast({
-      title: '创建成功',
-      icon: 'success'
+        // 保存到本地存储
+        wx.setStorageSync('maps', newMaps);
+
+        wx.showToast({
+          title: '创建成功',
+          icon: 'success'
+        });
+      },
+      fail: err => {
+        wx.showToast({
+          title: '创建失败',
+          icon: 'none'
+        });
+        console.error('创建新足迹失败', err);
+      }
     });
   },
 

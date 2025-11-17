@@ -24,22 +24,15 @@
     "miniprogram": {
       "list": [
         {
-          "name": "pages/my/my",
-          "pathName": "pages/my/my",
+          "name": "pages/cityList/cityList",
+          "pathName": "pages/cityList/cityList",
           "query": "",
           "scene": null,
           "launchMode": "default"
         },
         {
-          "name": "pages/cityList/cityList",
-          "pathName": "pages/cityList/cityList",
-          "query": "",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "pages/home/home",
-          "pathName": "pages/home/home",
+          "name": "pages/my/my",
+          "pathName": "pages/my/my",
           "query": "",
           "launchMode": "default",
           "scene": null

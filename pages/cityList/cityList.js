@@ -39,35 +39,50 @@ Page({
 
   /** 统一刷新展示数据（加载 visited 状态 + 统计） */
   refreshData() {
-    //从本地存储获取当前访问的列表id
+    // 获取当前足迹ID
     const currentMapId = wx.getStorageSync('currentMapId') || 'map1';
-    // 从本地存储获取已访问的城市数据
-    const visitedCities = wx.getStorageSync(`visitedCities_${currentMapId}`) || {};
-    const updatedData = this.data.citiesData.map(province => {
-      let visitedCount = 0;
-      const cities = province.cities.map(city => {
-        const cityKey = `${province.provinceCode}-${city.name}`;
-        const record = visitedCities[cityKey];
-        const isVisited = !!record?.on;
-        if (isVisited) visitedCount++;
-        return { ...city, visited: isVisited, note: record?.note || '', lastTime: record?.datetime || '' };
-      });
-      return { ...province, cities, visitedCount };
-    });
 
-    const zxs = updatedData.filter(p => ["110000","120000","310000","500000"].includes(p.provinceCode));
-    const zxsVCount = zxs.reduce((sum,p) => sum + p.visitedCount, 0);
+    // 获取云数据库中的已访问城市数据
+    this.getVisitedCities(currentMapId);
+  },
 
-    const totalVisited = updatedData.reduce((sum, p) => sum + p.visitedCount, 0);
-    const visitedPercent = this.data.totalCount ? Math.round((totalVisited / this.data.totalCount) * 100) : 0;
+  /** 从云数据库获取已访问城市数据 */
+  getVisitedCities(mapId) {
+    wx.cloud.callFunction({
+      name: 'getVisitedCities',
+      data: { mapId },
+      success: res => {
+        const visitedCities = res.result.success ? res.result.data : {};
+        const updatedData = this.data.citiesData.map(province => {
+          let visitedCount = 0;
+          const cities = province.cities.map(city => {
+            const cityKey = `${province.provinceCode}-${city.name}`;
+            const record = visitedCities[cityKey];
+            const isVisited = !!record?.on;
+            if (isVisited) visitedCount++;
+            return { ...city, visited: isVisited, note: record?.note || '', lastTime: record?.datetime || '' };
+          });
+          return { ...province, cities, visitedCount };
+        });
 
-    this.setData({
-      citiesData: updatedData,
-      displayData: updatedData,
-      zxs,
-      zxsVCount,
-      visitedCount: totalVisited,
-      visitedPercent
+        const zxs = updatedData.filter(p => ["110000","120000","310000","500000"].includes(p.provinceCode));
+        const zxsVCount = zxs.reduce((sum, p) => sum + p.visitedCount, 0);
+
+        const totalVisited = updatedData.reduce((sum, p) => sum + p.visitedCount, 0);
+        const visitedPercent = this.data.totalCount ? Math.round((totalVisited / this.data.totalCount) * 100) : 0;
+
+        this.setData({
+          citiesData: updatedData,
+          displayData: updatedData,
+          zxs,
+          zxsVCount,
+          visitedCount: totalVisited,
+          visitedPercent
+        });
+      },
+      fail: err => {
+        console.error('获取已访问城市失败', err);
+      }
     });
   },
 
@@ -82,8 +97,6 @@ Page({
     const city = e.currentTarget.dataset.city;
     const provinceCode = e.currentTarget.dataset.province;
     const cityKey = `${provinceCode}-${city.name}`;
-    const visitedCities = wx.getStorageSync('visitedCities') || {};
-    const record = visitedCities[cityKey] || {};
 
     this.setData({
       currentCity: { ...city, provinceCode, key: cityKey }
@@ -91,10 +104,10 @@ Page({
 
     const modal = this.selectComponent('#infoModal');
     modal.open({
-      on: !!record.on,
-      date: record.date || this._todayDate(),
-      time: record.time || this._nowTime(),
-      note: record.note || ''
+      on: !!this.data.currentCity.visited,
+      date: this.data.currentCity.lastTime || this._todayDate(),
+      time: this.data.currentCity.time || this._nowTime(),
+      note: this.data.currentCity.note || ''
     });
   },
 
@@ -108,22 +121,76 @@ Page({
     const detail = e.detail; // { on, date, time, datetime, note }
     const city = this.data.currentCity;
     if (!city) return;
-    //从本地存储获取当前访问的列表id
+  
+    // 获取当前足迹ID
     const currentMapId = wx.getStorageSync('currentMapId') || 'map1';
-    // 从本地存储获取已访问的城市数据
-    const visitedCities = wx.getStorageSync(`visitedCities_${currentMapId}`) || {};
-
-    visitedCities[city.key] = detail;
-
-    wx.setStorageSync(`visitedCities_${currentMapId}`, visitedCities);
-
-    // 更新展示数据
-    this.refreshData();
-
+  
+    // 在本地更新数据
+    const citiesData = [...this.data.citiesData];
+    let zxs = [];  // 直辖市
+    let zxsVCount = 0;  // 直辖市已访问数量
+  
+    citiesData.forEach(province => {
+      // 判断是否是直辖市（省份代码为 110000, 120000, 310000, 500000）
+      const isZxs = ["110000", "120000", "310000", "500000"].includes(province.provinceCode);
+  
+      let visitedCount = 0;  // 每个省份的已访问城市数量
+      province.cities.forEach(cityItem => {
+        const cityKey = `${province.provinceCode}-${cityItem.name}`;
+        if (cityKey === city.key) {
+          // 更新对应城市的访问状态
+          cityItem.visited = detail.on;
+          cityItem.note = detail.note || '';
+          cityItem.lastTime = detail.datetime || '';
+        }
+  
+        // 统计已访问城市
+        if (cityItem.visited) {
+          visitedCount++;
+        }
+      });
+  
+      // 更新每个省份的访问数量
+      province.visitedCount = visitedCount;
+  
+      // 处理直辖市数据
+      if (isZxs) {
+        zxs.push(province);  // 添加到直辖市列表
+        zxsVCount += visitedCount;  // 统计直辖市的已访问城市数量
+      }
+    });
+  
+    // 更新视图
+    this.setData({
+      citiesData,
+      displayData: citiesData,
+      zxs,  // 更新直辖市列表
+      zxsVCount,  // 更新直辖市已访问数量
+    });
+  
+    // 保存到云数据库（异步操作）
+    this.saveVisitedCity(currentMapId, city.key, detail);
+  
     wx.showToast({
       title: detail.on ? `点亮了${city.name}` : `关闭了${city.name}`,
       icon: 'success',
       duration: 1000
+    });
+  },
+  
+  
+
+  /** 保存城市访问状态到云数据库 */
+  saveVisitedCity(mapId, cityKey, detail) {
+    wx.cloud.callFunction({
+      name: 'updateVisitedCities',
+      data: { mapId, cityKey, detail },
+      success: res => {
+        console.log('城市访问状态已更新');
+      },
+      fail: err => {
+        console.error('更新城市访问状态失败', err);
+      }
     });
   },
 

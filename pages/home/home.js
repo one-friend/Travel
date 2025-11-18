@@ -4,7 +4,6 @@ import citiesByProvince from '../../data/citiesByProvince'
 import * as echarts from '../../ec-canvas/echarts';
 import { createSharePoster } from '../../utils/poster';
 const app = getApp()
-var GENJSON = chinaGeoJSON
 // 简化省份名称的辅助函数
 function simplifyProvinceName(fullName) {
   const simplifications = {
@@ -79,6 +78,7 @@ Page({
     
   },
   onShow: function() {
+    this.GENJSON = JSON.parse(JSON.stringify(chinaGeoJSON))
     // 加载已访问数据
     this.loadVisitedData()
   },
@@ -183,12 +183,12 @@ Page({
       }
     }
     // console.log(features)
-    const geoJSON = chinaGeoJSON || {};
+    const geoJSON = JSON.parse(JSON.stringify(chinaGeoJSON)) || {};
     geoJSON.features ? geoJSON.features.push(...features) : geoJSON.features = features
     //填充高亮区域
     this.processGeoJSON(geoJSON)
 
-    GENJSON = geoJSON;
+    this.GENJSON = geoJSON;
     cb&&cb()
   },
 
@@ -387,7 +387,6 @@ Page({
   initChart: function() {
     // 获取组件
     this.ecComponent = this.selectComponent('#map-canvas');
-    console.log(this.ecComponent)
     // 初始化图表
     this.ecComponent.init((canvas, width, height, dpr) => {
       const chart = echarts.init(canvas, null, {
@@ -397,7 +396,7 @@ Page({
       });
      
       // 注册地图
-      echarts.registerMap('china', GENJSON);
+      echarts.registerMap('china', this.GENJSON);
       
       // 准备地图数据
       const mapData = this.prepareMapData();
@@ -463,7 +462,7 @@ Page({
   },
 
   prepareMapData: function() {
-    const geojson = GENJSON
+    const geojson = this.GENJSON
     const visitedProvinces = this.data.visitedRegions.map(f => f.name);
     return geojson.features.map(feature => {
       const provinceName = feature.properties.name;

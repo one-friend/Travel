@@ -5,7 +5,7 @@ import { drawRoundImg, drawTextBlock } from './drawHelper';
 export function createSharePoster(options) {
   return new Promise(async (resolve, reject) => {
     try {
-      const { chartComponent, userInfo, text, watermark } = options;
+      const { chartComponent, userInfo, text, watermark, logo } = options;
       
       // 1. 导出图表
       const chartImage = await exportEChartImage(chartComponent);
@@ -19,45 +19,37 @@ export function createSharePoster(options) {
         });
       });
 
-      // 3. 设置固定海报尺寸（避免复杂计算）
+      // 3. 设置固定海报尺寸
       const posterWidth = 600;
       const posterHeight = 1000;
       const dpr = wx.getSystemInfoSync().pixelRatio;
 
       const ctx = wx.createCanvasContext('posterCanvas');
 
-      // 4. 绘制背景
-      ctx.setFillStyle('#ffffff');
+      // 4. 背景设计：渐变色 + 纹理效果
+      const gradient = ctx.createLinearGradient(0, 0, 0, posterHeight);
+      gradient.addColorStop(0, '#2C3E50');  // 深蓝色
+      gradient.addColorStop(1, '#6C7A89');  // 过渡到灰蓝色
+      ctx.setFillStyle(gradient);
       ctx.fillRect(0, 0, posterWidth, posterHeight);
-
-      // 5. 顶部区域 - 用户信息
-      // 头像
-      await drawRoundImg(ctx, userInfo.avatar, 30, 30, 60);
       
-      // 昵称和等级
-      ctx.setFontSize(28);
-      ctx.setFillStyle('#333333');
-      ctx.fillText(userInfo.nickname, 110, 55);
-      
-      ctx.setFontSize(24);
-      ctx.setFillStyle('#666666');
-      ctx.fillText(`已点亮${userInfo.level || 100}°`, 110, 90);
+      // 加入微妙的纹理效果（可以是某种艺术的模糊图案或者渐变）
+      ctx.setFillStyle('rgba(255, 255, 255, 0.1)');
+      ctx.beginPath();
+      ctx.arc(posterWidth / 2, posterHeight / 3, 200, 0, Math.PI * 2);
+      ctx.fill();
 
-      // 6. 标题区域
-      ctx.setFontSize(32);
-      ctx.setFillStyle('#000000');
+      // 5. 顶部区域：艺术感标题
+      ctx.setFontSize(40);
+      ctx.setFillStyle('#FFFFFF'); // 白色文字
       ctx.setTextAlign('center');
-      ctx.fillText(text.title || '我已经点亮了100个地方', posterWidth / 2, 160);
-      
-      ctx.setFontSize(26);
-      ctx.setFillStyle('#666666');
-      ctx.fillText(text.desc || '探索世界的每一个角落', posterWidth / 2, 200);
+      ctx.font = 'bold 40px "Helvetica Neue", sans-serif';  // 艺术字体
+      ctx.fillText(text.title || '点亮了100个地方', posterWidth / 2, 130);
 
-      // 7. 图表区域 - 关键修复
-      const chartMaxWidth = posterWidth - 80; // 左右各留40边距
-      const chartMaxHeight = 500; // 固定最大高度
+      // 6. 图表区域：增加边框 + 光影效果
+      const chartMaxWidth = posterWidth - 80;
+      const chartMaxHeight = 500;
       
-      // 按比例计算实际显示尺寸
       const chartRatio = imageInfo.width / imageInfo.height;
       let chartWidth = chartMaxWidth;
       let chartHeight = chartWidth / chartRatio;
@@ -66,39 +58,52 @@ export function createSharePoster(options) {
         chartHeight = chartMaxHeight;
         chartWidth = chartHeight * chartRatio;
       }
-      
+
       const chartX = (posterWidth - chartWidth) / 2;
-      const chartY = 240;
+      const chartY = 180;
 
-      console.log('图表绘制参数:', {
-        width: chartWidth,
-        height: chartHeight,
-        x: chartX,
-        y: chartY,
-        ratio: chartRatio
-      });
+      // 绘制图表背景：精致边框 + 投影效果
+      ctx.setFillStyle('#F7F7F7');  // 浅色背景
+      ctx.fillRect(chartX, chartY, chartWidth, chartHeight); // 绘制背景，不加边框
+      // ctx.fillRect(chartX - 15, chartY - 15, chartWidth + 30, chartHeight + 30); // 加粗边框
+      // ctx.setShadow(5, 5, 15, 'rgba(0, 0, 0, 0.2)'); // 添加阴影效果
+      // ctx.fillRect(chartX - 15, chartY - 15, chartWidth + 30, chartHeight + 30); // 绘制阴影边框
+      // ctx.setShadow(0, 0, 0, 'rgba(0, 0, 0, 0)'); // 清除阴影
 
-      // 绘制图表背景
-      ctx.setFillStyle('#f8f9fa');
-      ctx.fillRect(chartX - 10, chartY - 10, chartWidth + 20, chartHeight + 20);
-      
       // 绘制图表
       ctx.drawImage(chartImage, chartX, chartY, chartWidth, chartHeight);
 
-      // 8. 底部区域
+      // 7. 底部区域：精致的字体和用户信息
       const bottomY = chartY + chartHeight + 50;
-      
-      ctx.setFontSize(24);
-      ctx.setFillStyle('#333333');
-      ctx.fillText('继续去看看更大的世界吧', posterWidth / 2, bottomY);
-      
-      if (watermark) {
-        ctx.setFontSize(20);
-        ctx.setFillStyle('#999999');
-        ctx.fillText(watermark, posterWidth / 2, bottomY + 40);
+
+      // 头像 + 昵称
+      const avatarSize = 60;
+      const avatarX = 40;
+      const avatarY = posterHeight - avatarSize - 40;
+      await drawRoundImg(ctx, userInfo.avatar, avatarX, avatarY, avatarSize);
+
+      ctx.setFontSize(26);
+      ctx.setFillStyle('#FFFFFF');
+      ctx.font = 'italic 26px "Times New Roman", serif';  // 使用艺术字体
+      ctx.setShadow(2, 2, 5, 'rgba(0, 0, 0, 0.3)'); // 加阴影
+      ctx.fillText(userInfo.nickname, avatarX + avatarSize + 10, avatarY + 35);
+      ctx.setShadow(0, 0, 0, 'rgba(0, 0, 0, 0)'); // 清除阴影
+
+      // 8. 用户等级信息
+      ctx.setFontSize(22);
+      ctx.setFillStyle('#BDC3C7');
+      ctx.font = 'normal 22px sans-serif';
+      ctx.fillText(`已点亮${userInfo.level || 100}°`, avatarX + avatarSize + 10, avatarY + 65);
+
+      // 9. 添加底部logo：保持简洁
+      const logoSize = 50;
+      const logoX = posterWidth - logoSize - 20;
+      const logoY = posterHeight - logoSize - 20;
+      if (logo) {
+        ctx.drawImage(logo, logoX, logoY, logoSize, logoSize); // 绘制logo
       }
 
-      // 9. 绘制并导出
+      // 10. 绘制并导出
       ctx.draw(false, () => {
         setTimeout(() => {
           wx.canvasToTempFilePath({

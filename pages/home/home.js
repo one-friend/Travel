@@ -394,7 +394,7 @@ Page({
         height: height,
         devicePixelRatio: dpr
       });
-     
+
       // 注册地图
       echarts.registerMap('china', this.GENJSON);
       
@@ -406,7 +406,7 @@ Page({
         dataZoom:{
           type: 'inside'
         },
-        backgroundColor: '#f5f5f5',
+        backgroundColor: '#6C7A89',
         tooltip: {
           trigger: 'item',
           formatter: function(params) {

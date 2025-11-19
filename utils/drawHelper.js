@@ -1,7 +1,10 @@
 // utils/drawHelper.js
 export function drawRoundImg(ctx, imgUrl, x, y, size) {
   return new Promise(resolve => {
-    if(!imgUrl) resolve()
+    if(!imgUrl) {
+      resolve()
+      return;
+    }
     wx.getImageInfo({
       src: imgUrl,
       success(res) {
@@ -12,6 +15,9 @@ export function drawRoundImg(ctx, imgUrl, x, y, size) {
         ctx.drawImage(res.path, x, y, size, size);
         ctx.restore();
         resolve();
+      },
+      complete(res){
+        console.log(res)
       }
     });
   });

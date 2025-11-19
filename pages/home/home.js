@@ -506,7 +506,7 @@ Page({
   },
    // 生成分享图片
   async generateShareImage() {
-    const userInfo = app.globalData.userInfo
+    const userInfo = getApp().globalData.userInfo
     console.log('generateShareImage 点击触发了')
     wx.showLoading({
       title: '生成中',
@@ -524,7 +524,8 @@ Page({
               title: `我已经点亮了100个城市`,
               desc: '继续去看看更大的世界吧！'
             },
-            watermark: '不懒的旅行地图'
+            watermark: '不懒的旅行地图',
+            logo: false
           });
           console.log('✅ 生成成功:', filePath);
           wx.hideLoading()

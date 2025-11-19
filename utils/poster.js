@@ -6,7 +6,6 @@ export function createSharePoster(options) {
   return new Promise(async (resolve, reject) => {
     try {
       const { chartComponent, userInfo, text, watermark, logo } = options;
-      
       // 1. 导出图表
       const chartImage = await exportEChartImage(chartComponent);
       
@@ -100,7 +99,7 @@ export function createSharePoster(options) {
       const logoX = posterWidth - logoSize - 20;
       const logoY = posterHeight - logoSize - 20;
       if (logo) {
-        ctx.drawImage(logo, logoX, logoY, logoSize, logoSize); // 绘制logo
+        await drawRoundImg(ctx, 'https://636c-cloud1-6gdihppzc46de958-1385249519.tcb.qcloud.la/gh_c084e7dde486_258.jpg?sign=327250a36173512b5c083775ab799f11&t=1763533616', logoX, logoY, logoSize);
       }
 
       // 10. 绘制并导出

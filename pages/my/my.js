@@ -1,5 +1,5 @@
 const app = getApp();
-
+let updateTimer = null;
 Page({
   data: {
     userInfo: {
@@ -24,9 +24,7 @@ Page({
   },
 
   onShow() {
-    const userInfo = wx.getStorageSync('userInfo') || this.data.userInfo;
     const maps = wx.getStorageSync('maps') || this.data.maps;
-
     // 初始化每个足迹的数据
     this.initializeMapsData(maps);
     const currentMapId = wx.getStorageSync('currentMapId') || maps[this.data.currentMapIndex].id;
@@ -35,13 +33,66 @@ Page({
     this.getVisitedCities(currentMapId);
 
     this.setData({
-      userInfo,
       maps,
       currentMapName: maps[this.data.currentMapIndex].name,
       currentMapIndex: maps.findIndex(item => item.id === currentMapId)
     });
+    this._loadUserInfo()
+  },
+    /**
+   * 进入页面加载用户信息
+   * 优先本地 → 无则云端 → 云端也没有则初始化
+   */
+  async _loadUserInfo() {
+    // 1. 本地缓存
+    const local = wx.getStorageSync('userInfo');
+    console.log(local)
+    if (local && Object.keys(local).length > 0) {
+      this.setData({ userInfo: local });
+      app.setGlobalData && app.setGlobalData('userInfo', local);
+      console.log("📌 已从本地读取用户信息");
+      return;
+    }
+
+    // 2. 云数据库
+    try {
+      const res = await wx.cloud.callFunction({
+        name: 'getUserInfo',
+      });
+
+      if (res && res.result && res.result.data) {
+        const cloudInfo = res.result.data;
+
+        // 存本地 & UI
+        this.setData({ userInfo: cloudInfo });
+        wx.setStorageSync('userInfo', cloudInfo);
+        app.setGlobalData && app.setGlobalData('userInfo', cloudInfo);
+        console.log("☁ 已从云端加载用户信息");
+
+      } else {
+        console.log("⚠ 云端无用户信息，初始化中...");
+        this._initUserInfo();
+      }
+
+    } catch (err) {
+      console.error("❌ 获取云端用户信息失败", err);
+    }
   },
 
+  /**
+   * 首次使用时初始化用户信息
+   */
+  _initUserInfo() {
+    const initData = {
+      avatarUrl: '',
+      nickName: '',
+      createdAt: Date.now(),
+    };
+
+    this.setData({ userInfo: initData });
+    wx.setStorageSync('userInfo', initData);
+    app.setGlobalData && app.setGlobalData('userInfo', initData);
+  },
   // 从云数据库获取已访问城市数据
   getVisitedCities(mapId) {
     const db = wx.cloud.database();
@@ -273,22 +324,79 @@ Page({
     });
   },
 
-  chooseAvatar(e) {
-    let { userInfo } = this.data;
-    userInfo.avatarUrl = e.detail.avatarUrl;
-    this._syncUserInfo(userInfo);
+  async chooseAvatar(e) {
+    const tempPath = e.detail.avatarUrl;
+
+    // ① 上传到云存储
+    const cloudUrl = await this._uploadAvatar(tempPath);
+
+    // ② 存储 fileID
+    this._updateUserInfo({ avatarUrl: cloudUrl });
   },
 
   inputNickName(e) {
-    let { userInfo } = this.data;
-    userInfo.nickName = e.detail.value;
-    this._syncUserInfo(userInfo);
+    console.log(e)
+    const nickName = e.detail.value.trim();
+    this._updateUserInfo({ nickName });
   },
 
-  _syncUserInfo(userInfo) {
+  async _uploadAvatar(tempPath) {
+    try {
+      const ext = tempPath.split('.').pop(); // jpg/png
+      const cloudPath = `avatars/${Date.now()}.${ext}`;
+
+      const res = await wx.cloud.uploadFile({
+        cloudPath,
+        filePath: tempPath
+      });
+
+      console.log("☁ 上传成功 fileID:", res.fileID);
+      return res.fileID;
+
+    } catch (err) {
+      console.error("❌ 上传失败，使用临时路径：", err);
+      return tempPath; 
+    }
+  },
+  /**
+   * 核心统一处理用户信息更新
+   * 1. 更新 UI
+   * 2. 存本地缓存
+   * 3. 同步到全局
+   * 4. 自动节流后同步到云服务
+   */
+  _updateUserInfo(changes) {
+    const userInfo = { ...this.data.userInfo, ...changes };
+
+    // 更新 UI
     this.setData({ userInfo });
+
+    // 本地缓存
     wx.setStorageSync('userInfo', userInfo);
+
+    // 全局缓存
     app.setGlobalData && app.setGlobalData('userInfo', userInfo);
+
+    // 600ms 节流后更新云端
+    if (updateTimer) clearTimeout(updateTimer);
+    updateTimer = setTimeout(() => {
+      this._syncUserInfoToCloud(userInfo);
+    }, 600);
+  },
+
+   /**
+   * 真正更新到云数据库
+   */
+  async _syncUserInfoToCloud(userInfo) {
+    try {
+      await wx.cloud.callFunction({
+        name: 'updateUserInfo',
+        data: { userInfo }
+      });
+      console.log('☁ 用户信息已同步到云', userInfo);
+    } catch (err) {
+      console.error('❌ 同步失败：', err);
+    }
   },
 
   // 显示城市详情

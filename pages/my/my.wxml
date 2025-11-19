@@ -5,7 +5,7 @@
     <button open-type="chooseAvatar" class="avatar-btn" bindchooseavatar="chooseAvatar">
       <image class="avatar" src="{{userInfo.avatarUrl}}" mode="aspectFill" />
     </button>
-    <input class="username" type="text" value="{{userInfo.nickName}}" bindinput="inputNickName" placeholder="请输入昵称" />
+    <input class="username" type="nickname" value="{{userInfo.nickName}}" bindchange="inputNickName" placeholder="请输入昵称" />
     <text class="city-count">已点亮 {{visitedCities.length}} 个城市</text>
   </view>
 

@@ -81,25 +81,30 @@ export function createSharePoster(options) {
       const avatarY = posterHeight - avatarSize - 40;
       await drawRoundImg(ctx, userInfo.avatar, avatarX, avatarY, avatarSize);
 
-      ctx.setFontSize(26);
+      // 第一段文字
       ctx.setFillStyle('#FFFFFF');
-      ctx.font = 'italic 26px "Times New Roman", serif';  // 使用艺术字体
-      ctx.setShadow(2, 2, 5, 'rgba(0, 0, 0, 0.3)'); // 加阴影
+      ctx.setFontSize(26);
+      ctx.font = 'italic 26px "Times New Roman", serif';
+      ctx.setTextAlign('left');
+      ctx.setTextBaseline('alphabetic');
+      ctx.setShadow(2, 2, 5, 'rgba(0, 0, 0, 0.3)');
       ctx.fillText(userInfo.nickname, avatarX + avatarSize + 10, avatarY + 35);
-      ctx.setShadow(0, 0, 0, 'rgba(0, 0, 0, 0)'); // 清除阴影
 
-      // 8. 用户等级信息
-      ctx.setFontSize(22);
+      // 完全重置第二段文字的所有样式
       ctx.setFillStyle('#BDC3C7');
+      ctx.setFontSize(22);
       ctx.font = 'normal 22px sans-serif';
-      ctx.fillText(`已点亮${userInfo.level || 100}°`, avatarX + avatarSize + 10, avatarY + 65);
+      ctx.setTextAlign('left');
+      ctx.setTextBaseline('alphabetic');
+      ctx.setShadow(0, 0, 0, 'rgba(0, 0, 0, 0)'); // 明确清除阴影
+      ctx.fillText(`这里写点文案`, avatarX + avatarSize + 10, avatarY + 65);
 
       // 9. 添加底部logo：保持简洁
       const logoSize = 50;
       const logoX = posterWidth - logoSize - 20;
       const logoY = posterHeight - logoSize - 20;
       if (logo) {
-        await drawRoundImg(ctx, 'https://636c-cloud1-6gdihppzc46de958-1385249519.tcb.qcloud.la/gh_c084e7dde486_258.jpg?sign=327250a36173512b5c083775ab799f11&t=1763533616', logoX, logoY, logoSize);
+        await drawRoundImg(ctx, 'cloud://cloud1-6gdihppzc46de958.636c-cloud1-6gdihppzc46de958-1385249519/gh_c084e7dde486_258.jpg', logoX, logoY, logoSize);
       }
 
       // 10. 绘制并导出

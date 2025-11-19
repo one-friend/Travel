@@ -521,11 +521,11 @@ Page({
               avatar: userInfo?.avatarUrl  
             },
             text: {
-              title: `我已经点亮了100个城市`,
+              title: `我已经点亮了${this.data.visitedCount}个城市`,
               desc: '继续去看看更大的世界吧！'
             },
             watermark: '不懒的旅行地图',
-            logo: false
+            logo: true
           });
           console.log('✅ 生成成功:', filePath);
           wx.hideLoading()

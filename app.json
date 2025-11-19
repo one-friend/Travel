@@ -10,18 +10,18 @@
     "navigationBarBackgroundColor": "#ffffff"
   },
   "tabBar": {
+    "selectedColor": "#296bee",
     "list": [
       {
         "pagePath": "pages/home/home",
         "text": "地图",
-        "iconPath": "",
-        "selectedIconPath": ""
-      },
+        "iconPath": "./images/indes.png",
+        "selectedIconPath": "./images/indes_s.png"      },
       {
         "pagePath": "pages/my/my",
         "text": "我的",
-        "iconPath": "",
-        "selectedIconPath": ""
+        "iconPath": "./images/home.png",
+        "selectedIconPath": "./images/home_s.png"
       }
     ]
   },

@@ -15,7 +15,7 @@
       <button bindtap="switchMap" data-index="{{index}}" class="map-btn {{currentMapIndex===index?'active':''}}">
         {{item.name}}
       </button>
-      <button class="rename-btn" bindtap="showRenameModal" data-index="{{index}}">✎</button>
+      <button class="rename-btn" bindtap="showRenameModal" data-index="{{index}}">✍️</button>
     </view>
     <!-- 创建新足迹按钮 -->
     <button class="map-btn create-btn" bindtap="showCreateModal">+ 新建</button>

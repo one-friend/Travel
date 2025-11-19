@@ -424,5 +424,11 @@ Page({
   // 退出登录
   logout() {
     // wx.removeStorageSync('userInfo');
+  },
+
+  goListPage(){
+    wx.navigateTo({
+      url: '/pages/cityList/cityList'
+    })
   }
 });

@@ -395,3 +395,9 @@ wx-button::after{
   padding: 60rpx 0;
   width: 100%;
 }
+
+.go_light {
+  padding: 0;
+  color: #1e4fff;
+  text-decoration: underline;
+}

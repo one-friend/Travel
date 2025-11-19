@@ -31,7 +31,7 @@
           <text class="city-time">{{item.date || item.datetime}}</text>
         </view>
       </block>
-      <view wx:if="{{visitedCities.length === 0}}" class="empty-tip">还没有点亮任何城市哦～</view>
+      <view wx:if="{{visitedCities.length === 0}}" class="empty-tip">还没有点亮任何城市哦～ <span class="empty-tip go_light" bind:tap="goListPage">去点亮</span></view>
     </view>
   </view>
 

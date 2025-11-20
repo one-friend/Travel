@@ -131,7 +131,7 @@ page {
 
 .logout-button {
   width: 80%;
-  background: linear-gradient(135deg, #ff7f50, #ff4f4f);
+  background: linear-gradient(135deg, #4a90e2, #3d6aff);
   color: #fff;
   border: none;
   border-radius: 40rpx;
@@ -139,7 +139,7 @@ page {
   font-size: 30rpx;
   font-weight: 600;
   text-align: center;
-  box-shadow: 0 8rpx 16rpx rgba(255, 79, 79, 0.25);
+  box-shadow: 0 8rpx 16rpx rgba(61, 106, 255, 0.3);
   transition: all 0.25s ease;
 }
 
@@ -318,13 +318,13 @@ wx-button::after{
 
 /* 创建足迹按钮 */
 .create-btn {
-  background: linear-gradient(135deg, #ff7f50, #ff6b6b) !important;
+  background: linear-gradient(135deg, #4a90e2, #3d6aff) !important;
   color: #fff !important;
   border: none !important;
 }
 
 .create-btn:active {
-  background: linear-gradient(135deg, #ff6b47, #ff5252) !important;
+  background: linear-gradient(135deg, #4a90e2, #3d6aff) !important;
   transform: scale(0.95);
 }
 

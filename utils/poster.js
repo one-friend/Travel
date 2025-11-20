@@ -33,10 +33,10 @@ export function createSharePoster(options) {
       ctx.fillRect(0, 0, posterWidth, posterHeight);
       
       // 加入微妙的纹理效果（可以是某种艺术的模糊图案或者渐变）
-      ctx.setFillStyle('rgba(255, 255, 255, 0.1)');
-      ctx.beginPath();
-      ctx.arc(posterWidth / 2, posterHeight / 3, 200, 0, Math.PI * 2);
-      ctx.fill();
+      // ctx.setFillStyle('rgba(255, 255, 255, 0.1)');
+      // ctx.beginPath();
+      // ctx.arc(posterWidth / 2, posterHeight / 3, 200, 0, Math.PI * 2);
+      // ctx.fill();
 
       // 5. 顶部区域：艺术感标题
       ctx.setFontSize(40);
@@ -62,8 +62,8 @@ export function createSharePoster(options) {
       const chartY = 180;
 
       // 绘制图表背景：精致边框 + 投影效果
-      ctx.setFillStyle('#F7F7F7');  // 浅色背景
-      ctx.fillRect(chartX, chartY, chartWidth, chartHeight); // 绘制背景，不加边框
+      // ctx.setFillStyle('#F7F7F7');  // 浅色背景
+      // ctx.fillRect(chartX, chartY, chartWidth, chartHeight); // 绘制背景，不加边框
       // ctx.fillRect(chartX - 15, chartY - 15, chartWidth + 30, chartHeight + 30); // 加粗边框
       // ctx.setShadow(5, 5, 15, 'rgba(0, 0, 0, 0.2)'); // 添加阴影效果
       // ctx.fillRect(chartX - 15, chartY - 15, chartWidth + 30, chartHeight + 30); // 绘制阴影边框

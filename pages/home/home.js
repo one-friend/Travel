@@ -406,7 +406,7 @@ Page({
         dataZoom:{
           type: 'inside'
         },
-        backgroundColor: '#6C7A89',
+        backgroundColor: 'transparent',
         tooltip: {
           trigger: 'item',
           formatter: function(params) {
@@ -415,6 +415,7 @@ Page({
         },
         visualMap: {
           type: 'piecewise',
+          show: false,
           pieces: [
             {min: 1, max: 1, label: '已到访', color: '#ff6b6b'},
             {min: 0, max: 0, label: '未到访', color: '#d9d9d9'}

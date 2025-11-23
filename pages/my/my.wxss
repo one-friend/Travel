@@ -55,15 +55,25 @@ page {
   color: #607d8b;
 }
 
-/* ===== 地图切换 ===== */
+/* ===== 地图切换（优化样式） ===== */
 .map-switch {
   display: flex;
+  flex-wrap: wrap; 
   justify-content: center;
-  gap: 20rpx;
+  gap: 30rpx 20rpx; 
   margin-bottom: 60rpx;
 }
 
-.map-switch button {
+.map-item {
+  position: relative;
+  padding-top: 20rpx; 
+  display: flex;
+  align-items: center;
+  flex-shrink: 0; 
+}
+
+/* 主地图按钮通用样式 */
+.map-btn {
   background-color: #e8f1ff;
   border-radius: 30rpx;
   padding: 14rpx 40rpx;
@@ -72,16 +82,91 @@ page {
   border: 2rpx solid transparent;
   transition: all 0.3s ease;
   box-shadow: 0 4rpx 10rpx rgba(0, 0, 0, 0.05);
+  margin: 0;
+  line-height: 1.4; 
+  height: auto;
 }
 
-.map-switch button.active {
+.map-btn.active {
   background: linear-gradient(135deg, #4a90e2, #3d6aff);
   color: #fff;
   box-shadow: 0 8rpx 16rpx rgba(61, 106, 255, 0.3);
   border: none;
 }
 
-/* ===== 足迹卡片 ===== */
+/* 动作按钮容器：定位到 map-item 的右上角 */
+.map-actions {
+  position: absolute;
+  right: 0;
+  top: 0; 
+  display: flex;
+  flex-direction: row; 
+  align-items: center;
+  gap: 8rpx;
+  z-index: 5; 
+  transform: translateX(10rpx); 
+}
+
+/* 动作按钮通用样式 */
+.action-btn {
+  width: 40rpx;
+  height: 40rpx;
+  min-width: 40rpx;
+  padding: 0;
+  border: none;
+  background: rgba(255, 255, 255, 0.85) !important; 
+  border-radius: 50%;
+  font-size: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s;
+  box-shadow: 0 1rpx 4rpx rgba(0, 0, 0, 0.15); 
+  margin: 0;
+  line-height: 1;
+}
+.action-btn::after {
+  border: none;
+}
+.action-btn:active {
+  transform: scale(0.9);
+}
+
+/* 重命名样式 */
+.rename-btn {
+  color: #3d6aff;
+  font-size: 24rpx;
+}
+
+/* 删除样式 */
+.delete-btn {
+  background-color: #ff4d4f !important;
+  box-shadow: 0 1rpx 4rpx rgba(255, 77, 79, 0.4);
+}
+
+.delete-icon {
+  color: #fff;
+  font-size: 30rpx; 
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* 创建足迹按钮 */
+.create-btn {
+  background: linear-gradient(135deg, #4a90e2, #3d6aff) !important;
+  color: #fff !important;
+  border: none !important;
+  /* 修复新建按钮高度 */
+  line-height: 1.4;
+  height: auto;
+}
+
+.create-btn:active {
+  background: linear-gradient(135deg, #4a90e2, #3d6aff) !important;
+  transform: scale(0.95);
+}
+
+/* ===== 足迹卡片及文案区 ===== */
 .section {
   width: 100%;
   background: #fff;
@@ -90,6 +175,43 @@ page {
   padding: 40rpx;
   margin-bottom: 40rpx;
 }
+
+/* 新增：地图说明文案区域 */
+.map-description-container {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  background: #f8faff; /* 浅蓝背景 */
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 30rpx;
+  border: 1rpx solid #e0eaff;
+}
+
+.map-description-text {
+  flex: 1;
+  font-size: 28rpx;
+  color: #4a5a6b;
+  line-height: 1.6;
+  white-space: pre-wrap; /* 保持换行 */
+}
+
+.map-description-edit {
+  background: none;
+  border: none;
+  color: #3d6aff;
+  font-size: 26rpx;
+  padding: 0 0 0 20rpx;
+  margin: 0;
+  line-height: 1.6;
+  min-width: unset;
+  height: auto;
+}
+.map-description-edit::after {
+  border: none;
+}
+/* End 新增：地图说明文案区域 */
+
 
 .section-title {
   font-size: 32rpx;
@@ -121,7 +243,20 @@ page {
   box-shadow: 0 6rpx 12rpx rgba(61, 106, 255, 0.25);
 }
 
-/* ===== 退出登录按钮 ===== */
+.empty-tip {
+  text-align: center;
+  color: #999;
+  font-size: 28rpx;
+  padding: 60rpx 0;
+  width: 100%;
+}
+
+.go_light {
+  padding: 0;
+  color: #1e4fff;
+  text-decoration: underline;
+}
+
 .logout-section {
   margin-top: 30rpx;
   width: 100%;
@@ -133,7 +268,6 @@ page {
   width: 80%;
   background: linear-gradient(135deg, #4a90e2, #3d6aff);
   color: #fff;
-  border: none;
   border-radius: 40rpx;
   padding: 26rpx 0;
   font-size: 30rpx;
@@ -141,6 +275,7 @@ page {
   text-align: center;
   box-shadow: 0 8rpx 16rpx rgba(61, 106, 255, 0.3);
   transition: all 0.25s ease;
+  border: none;
 }
 
 .logout-button:active {
@@ -148,7 +283,7 @@ page {
   opacity: 0.9;
 }
 
-/* ===== 弹层 ===== */
+/* 弹层样式 */
 .popup-mask {
   position: fixed;
   top: 0;
@@ -195,6 +330,9 @@ page {
   align-items: center;
   margin-bottom: 30rpx;
 }
+.popup-field.description-input-field {
+  display: block; /* 覆盖 flex 布局，方便 textarea 占据整行 */
+}
 
 .label {
   font-size: 28rpx;
@@ -224,112 +362,25 @@ page {
   box-shadow: inset 0 0 8rpx rgba(0, 0, 0, 0.05);
 }
 
-.popup-save {
+/* 新增：文案编辑输入框 */
+.description-textarea {
   width: 100%;
-  background: linear-gradient(135deg, #4a90e2, #3d6aff);
-  color: #fff;
-  border-radius: 40rpx;
-  padding: 24rpx 0;
-  font-size: 30rpx;
-  font-weight: 600;
-  text-align: center;
-  box-shadow: 0 8rpx 16rpx rgba(61, 106, 255, 0.3);
-  transition: all 0.2s;
-  margin-top: 20rpx;
-}
-
-.popup-save:active {
-  transform: scale(0.97);
-}
-
-wx-button::after{
-  border: none;
-}
-/* 在原有CSS基础上添加以下样式 */
-
-/* 地图切换项容器 */
-.map-item {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-/* 重命名按钮 */
-.rename-btn {
-  position: absolute;
-  right: -20rpx;
-  top: 0rpx;
-  width: 30rpx;
-  height: 30rpx;
-  border: none;
-  background: unset !important;
-  color: #ff6b6b !important;
-  border-radius: 50%;
-  font-size: 20rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  z-index: 2;
-  box-shadow: unset !important;
-}
-
-/* 重命名输入框 */
-.rename-input {
-  flex: 1;
+  min-height: 150rpx; 
   background: #f8faff;
   border-radius: 16rpx;
   padding: 20rpx;
   font-size: 28rpx;
   color: #333;
-  margin-left: 20rpx;
   box-shadow: inset 0 0 8rpx rgba(0, 0, 0, 0.05);
+  border: 2rpx solid #e0e0e0;
 }
-
-/* 取消按钮 */
-.popup-cancel {
-  width: 100%;
-  background: #f0f0f0;
-  color: #666;
-  border-radius: 40rpx;
-  padding: 24rpx 0;
-  font-size: 30rpx;
-  font-weight: 600;
-  text-align: center;
-  margin-top: 20rpx;
-  border: none;
+.description-textarea:focus {
+  border-color: #4a90e2;
 }
-
-.popup-cancel:active {
-  background: #e0e0e0;
-}
-
-/* 空状态提示 */
-.empty-tip {
-  text-align: center;
-  color: #999;
-  font-size: 28rpx;
-  padding: 60rpx 0;
-  width: 100%;
-}
+/* End 新增：文案编辑输入框 */
 
 
-/* 在原有CSS基础上添加以下样式 */
-
-/* 创建足迹按钮 */
-.create-btn {
-  background: linear-gradient(135deg, #4a90e2, #3d6aff) !important;
-  color: #fff !important;
-  border: none !important;
-}
-
-.create-btn:active {
-  background: linear-gradient(135deg, #4a90e2, #3d6aff) !important;
-  transform: scale(0.95);
-}
-
-/* 创建输入框 */
-.create-input {
+.create-input, .rename-input {
   flex: 1;
   background: #f8faff;
   border-radius: 16rpx;
@@ -341,11 +392,10 @@ wx-button::after{
   border: 2rpx solid #e0e0e0;
 }
 
-.create-input:focus {
+.create-input:focus, .rename-input:focus {
   border-color: #4a90e2;
 }
 
-/* 弹层按钮布局 */
 .popup-buttons {
   display: flex;
   gap: 20rpx;
@@ -387,17 +437,6 @@ wx-button::after{
   transform: scale(0.98);
 }
 
-/* 空状态提示 */
-.empty-tip {
-  text-align: center;
-  color: #999;
-  font-size: 28rpx;
-  padding: 60rpx 0;
-  width: 100%;
-}
-
-.go_light {
-  padding: 0;
-  color: #1e4fff;
-  text-decoration: underline;
+wx-button::after{
+  border: none;
 }

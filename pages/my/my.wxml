@@ -1,6 +1,4 @@
-<!-- pages/my/my.wxml -->
 <view class="container">
-  <!-- 用户信息区 -->
   <view class="profile">
     <button open-type="chooseAvatar" class="avatar-btn" bindchooseavatar="chooseAvatar">
       <image class="avatar" src="{{userInfo.avatarUrl}}" mode="aspectFill" />
@@ -9,20 +7,29 @@
     <text class="city-count">已点亮 {{visitedCities.length}} 个城市</text>
   </view>
 
-  <!-- 地图切换 -->
   <view class="map-switch">
     <view wx:for="{{maps}}" wx:key="index" class="map-item">
       <button bindtap="switchMap" data-index="{{index}}" class="map-btn {{currentMapIndex===index?'active':''}}">
         {{item.name}}
       </button>
-      <button class="rename-btn" bindtap="showRenameModal" data-index="{{index}}">✍️</button>
+      
+      <view class="map-actions">
+        <button class="action-btn rename-btn" bindtap="showRenameModal" data-index="{{index}}">
+            ✍️
+        </button>
+        <button wx:if="{{maps.length > 1}}" class="action-btn delete-btn" bindtap="deleteMap" data-index="{{index}}">
+            <text class="delete-icon">×</text>
+        </button>
+      </view>
     </view>
-    <!-- 创建新足迹按钮 -->
     <button class="map-btn create-btn" bindtap="showCreateModal">+ 新建</button>
   </view>
 
-  <!-- 足迹列表 -->
   <view class="section">
+    <view class="map-description-container">
+        <text class="map-description-text">{{currentDescription}}</text>
+        <button class="map-description-edit" bindtap="showDescriptionModal">编辑</button>
+    </view>
     <text class="section-title">我的足迹 - {{currentMapName}}</text>
     <view class="city-list">
       <block wx:for="{{visitedCities}}" wx:key="index">
@@ -35,12 +42,10 @@
     </view>
   </view>
 
-  <!-- 退出按钮 -->
   <view class="logout-section">
     <button class="logout-button" bindtap="logout">退出登录</button>
   </view>
 
-  <!-- 城市详情弹层 -->
   <view wx:if="{{showDetailModal}}" class="popup-mask" bindtap="closePopup">
     <view class="popup" catchtap="stopTap">
       <text class="popup-title">{{currentCity.name}}</text>
@@ -56,7 +61,6 @@
     </view>
   </view>
 
-  <!-- 创建足迹弹层 -->
   <view wx:if="{{showCreateModal}}" class="popup-mask" bindtap="closeCreateModal">
     <view class="popup" catchtap="stopTap">
       <text class="popup-title">创建新足迹</text>
@@ -73,7 +77,6 @@
     </view>
   </view>
 
-  <!-- 重命名弹层 -->
   <view wx:if="{{showRenameModal}}" class="popup-mask" bindtap="closeRenameModal">
     <view class="popup" catchtap="stopTap">
       <text class="popup-title">重命名足迹</text>
@@ -86,6 +89,28 @@
       <view class="popup-buttons">
         <button class="popup-cancel" bindtap="closeRenameModal">取消</button>
         <button class="popup-save" bindtap="confirmRename">保存</button>
+      </view>
+    </view>
+  </view>
+  
+  <view wx:if="{{showDescriptionModal}}" class="popup-mask" bindtap="closeDescriptionModal">
+    <view class="popup" catchtap="stopTap">
+      <text class="popup-title">编辑足迹说明</text>
+      
+      <view class="popup-field description-input-field">
+        <textarea 
+          class="description-textarea" 
+          placeholder="请输入足迹说明文案" 
+          value="{{descriptionInput}}" 
+          bindinput="onDescriptionInput" 
+          maxlength="200" 
+          auto-height
+        />
+      </view>
+
+      <view class="popup-buttons">
+        <button class="popup-cancel" bindtap="closeDescriptionModal">取消</button>
+        <button class="popup-save" bindtap="confirmUpdateDescription">保存</button>
       </view>
     </view>
   </view>

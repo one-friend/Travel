@@ -17,92 +17,82 @@ Page({
     showDetailModal: false,
     showCreateModal: false,
     showRenameModal: false,
+    showDescriptionModal: false, 
+    currentDescription: '',      
+    descriptionInput: '',        
     currentCity: {},
     newMapName: '',
     renameText: '',
     renamingIndex: -1
   },
 
-  onShow() {
+  async onShow() {
     const maps = wx.getStorageSync('maps') || this.data.maps;
-    // 初始化每个足迹的数据
-    this.initializeMapsData(maps);
     const currentMapId = wx.getStorageSync('currentMapId') || maps[this.data.currentMapIndex].id;
     
-    // 从云数据库获取已访问城市数据
-    this.getVisitedCities(currentMapId);
-
+    const currentIndex = maps.findIndex(item => item.id === currentMapId);
+    
     this.setData({
       maps,
-      currentMapName: maps[this.data.currentMapIndex].name,
-      currentMapIndex: maps.findIndex(item => item.id === currentMapId)
+      currentMapIndex: currentIndex > -1 ? currentIndex : 0,
+      currentMapName: maps[currentIndex > -1 ? currentIndex : 0].name,
     });
-    this._loadUserInfo()
-  },
-    /**
-   * 进入页面加载用户信息
-   * 优先本地 → 无则云端 → 云端也没有则初始化
-   */
-  async _loadUserInfo() {
-    // 1. 本地缓存
-    const local = wx.getStorageSync('userInfo');
-    console.log(local)
-    if (local && Object.keys(local).length > 0) {
-      this.setData({ userInfo: local });
-      app.setGlobalData && app.setGlobalData('userInfo', local);
-      console.log("📌 已从本地读取用户信息");
-      return;
-    }
-
-    // 2. 云数据库
+    
+    // 核心修改：使用 await 等待当前地图的数据在云端被创建，确保后续操作有文档可读写
+    wx.showLoading({ title: '加载数据中', mask: true });
     try {
-      const res = await wx.cloud.callFunction({
-        name: 'getUserInfo',
-      });
-
-      if (res && res.result && res.result.data) {
-        const cloudInfo = res.result.data;
-
-        // 存本地 & UI
-        this.setData({ userInfo: cloudInfo });
-        wx.setStorageSync('userInfo', cloudInfo);
-        app.setGlobalData && app.setGlobalData('userInfo', cloudInfo);
-        console.log("☁ 已从云端加载用户信息");
-
-      } else {
-        console.log("⚠ 云端无用户信息，初始化中...");
-        this._initUserInfo();
-      }
-
-    } catch (err) {
-      console.error("❌ 获取云端用户信息失败", err);
+        await this._ensureMapData(currentMapId);
+        // 数据创建或确保存在后，再获取和展示数据
+        this.getVisitedCities(currentMapId);
+    } catch (e) {
+        console.error('初始化数据失败:', e);
+        wx.showToast({ title: '初始化失败', icon: 'none' });
+    } finally {
+        wx.hideLoading();
     }
+    
+    // 加载用户信息（与其他数据无强依赖关系，可异步）
+    this._loadUserInfo();
   },
-
+    
   /**
-   * 首次使用时初始化用户信息
+   * 确保足迹数据在云端有记录 (现在返回 Promise，可 await)
+   * @param {string} mapId - 当前地图 ID
    */
-  _initUserInfo() {
-    const initData = {
-      avatarUrl: '',
-      nickName: '',
-      createdAt: Date.now(),
-    };
-
-    this.setData({ userInfo: initData });
-    wx.setStorageSync('userInfo', initData);
-    app.setGlobalData && app.setGlobalData('userInfo', initData);
+  _ensureMapData(mapId) {
+    return wx.cloud.callFunction({
+      name: 'mapService',
+      data: {
+        action: 'ensureMapData',
+        mapId: mapId
+      }
+    }).then(res => {
+      if (!res.result.success) {
+        throw new Error(res.result.errMsg || '云端初始化失败');
+      }
+      return res;
+    }).catch(err => {
+      console.error(`调用 ensureMapData 失败 for ${mapId}`, err);
+      // 抛出错误，以便 onShow 可以捕获
+      throw err;
+    });
   },
-  // 从云数据库获取已访问城市数据
+
+  // 从云数据库获取已访问城市数据和文案
   getVisitedCities(mapId) {
     const db = wx.cloud.database();
     db.collection('visitedCities').where({
       mapId: mapId
     }).get({
       success: res => {
-        const visitedCities = res.data[0] ? res.data[0].cities : {};
+        const data = res.data[0];
+        const visitedCities = data ? data.cities : {};
+        // 提取 description，提供一个友好的默认值
+        const description = data && data.description !== undefined ? data.description : '这是一个新的足迹，还没有任何介绍哦！';
+        
         this.setData({
-          visitedCities: this._parseVisitedCities(visitedCities)
+          visitedCities: this._parseVisitedCities(visitedCities),
+          currentDescription: description // 更新当前文案
         });
       },
       fail: err => {
@@ -110,33 +100,7 @@ Page({
       }
     });
   },
-
-  // 初始化足迹数据
-  initializeMapsData(maps) {
-    maps.forEach(map => {
-      this.checkMapData(map.id);
-    });
-  },
-
-  // 检查足迹是否有数据，如果没有则创建空数据
-  checkMapData(mapId) {
-    const db = wx.cloud.database();
-    db.collection('visitedCities').where({
-      mapId: mapId
-    }).get({
-      success: res => {
-        if (res.data.length === 0) {
-          db.collection('visitedCities').add({
-            data: {
-              mapId: mapId,
-              cities: {}
-            }
-          });
-        }
-      }
-    });
-  },
-
+  
   // 提取已点亮城市
   _parseVisitedCities(data) {
     return Object.keys(data)
@@ -156,13 +120,25 @@ Page({
     const index = e.currentTarget.dataset.index;
     const currentMapId = this.data.maps[index].id;
     
-    // 从云数据库获取新足迹的数据
-    this.getVisitedCities(currentMapId);
     wx.setStorageSync('currentMapId', currentMapId)
     this.setData({
       currentMapIndex: index,
       currentMapName: this.data.maps[index].name
     });
+    
+    // 切换地图时，也要确保数据存在并获取
+    wx.showLoading({ title: '切换中', mask: true });
+    this._ensureMapData(currentMapId)
+      .then(() => {
+          this.getVisitedCities(currentMapId);
+      })
+      .catch(e => {
+           wx.showToast({ title: '数据加载失败', icon: 'none' });
+           console.error('切换地图数据初始化失败:', e);
+      })
+      .finally(() => {
+          wx.hideLoading();
+      });
   },
 
   // 创建新足迹
@@ -188,7 +164,7 @@ Page({
     });
   },
 
-  // 确认创建足迹
+  // 确认创建足迹 (使用云函数)
   confirmCreateMap() {
     const { newMapName, maps } = this.data;
     
@@ -201,7 +177,8 @@ Page({
     }
 
     // 检查名称是否重复
-    const isDuplicate = maps.some(map => map.name === newMapName.trim());
+    const name = newMapName.trim();
+    const isDuplicate = maps.some(map => map.name === name);
     if (isDuplicate) {
       wx.showToast({
         title: '名称已存在',
@@ -210,24 +187,22 @@ Page({
       return;
     }
 
-    // 生成新的足迹ID和名称
+    // 生成新的足迹ID
     const newMapId = `map${Date.now()}`;
-    const newMap = {
-      name: newMapName.trim(),
-      id: newMapId
-    };
-
-    // 更新maps数据
-    const newMaps = [...maps, newMap];
-
-    // 将新足迹数据保存到云数据库
-    const db = wx.cloud.database();
-    db.collection('visitedCities').add({
+    
+    // 调用云函数创建地图数据
+    wx.cloud.callFunction({
+      name: 'mapService',
       data: {
-        mapId: newMapId,
-        cities: {}
-      },
-      success: () => {
+        action: 'createMap',
+        mapId: newMapId
+      }
+    }).then(res => {
+      if (res.result.success) {
+        // 客户端更新 maps 列表
+        const newMap = { name: name, id: newMapId };
+        const newMaps = [...maps, newMap];
+        
         this.setData({
           maps: newMaps,
           showCreateModal: false,
@@ -241,14 +216,15 @@ Page({
           title: '创建成功',
           icon: 'success'
         });
-      },
-      fail: err => {
-        wx.showToast({
-          title: '创建失败',
-          icon: 'none'
-        });
-        console.error('创建新足迹失败', err);
+      } else {
+        throw new Error(res.result.errMsg || '创建地图数据失败');
       }
+    }).catch(err => {
+      wx.showToast({
+        title: '创建失败',
+        icon: 'none'
+      });
+      console.error('调用 createMap 云函数失败', err);
     });
   },
 
@@ -293,8 +269,9 @@ Page({
     }
 
     // 检查名称是否重复（排除自己）
+    const name = renameText.trim();
     const isDuplicate = maps.some((map, index) => 
-      index !== renamingIndex && map.name === renameText.trim()
+      index !== renamingIndex && map.name === name
     );
     if (isDuplicate) {
       wx.showToast({
@@ -306,11 +283,11 @@ Page({
 
     // 更新maps数据
     const newMaps = [...maps];
-    newMaps[renamingIndex].name = renameText.trim();
+    newMaps[renamingIndex].name = name;
     
     this.setData({
       maps: newMaps,
-      currentMapName: renamingIndex === this.data.currentMapIndex ? renameText.trim() : this.data.currentMapName
+      currentMapName: renamingIndex === this.data.currentMapIndex ? name : this.data.currentMapName
     });
 
     // 保存到本地存储
@@ -323,19 +300,127 @@ Page({
       icon: 'success'
     });
   },
+  
+  // 显示说明文案编辑弹层
+  showDescriptionModal() {
+    this.setData({
+      showDescriptionModal: true,
+      descriptionInput: this.data.currentDescription 
+    });
+  },
+
+  // 关闭说明文案编辑弹层
+  closeDescriptionModal() {
+    this.setData({
+      showDescriptionModal: false,
+      descriptionInput: ''
+    });
+  },
+
+  // 说明文案输入
+  onDescriptionInput(e) {
+    this.setData({
+      descriptionInput: e.detail.value
+    });
+  },
+
+  // 确认更新说明文案 (使用云函数)
+  confirmUpdateDescription() {
+    const { currentMapIndex, maps, descriptionInput } = this.data;
+    const currentMapId = maps[currentMapIndex].id;
+    const newDescription = descriptionInput.trim();
+
+    if (!newDescription) {
+      wx.showToast({
+        title: '文案不能为空',
+        icon: 'none'
+      });
+      return;
+    }
+    
+    // 调用云函数更新描述
+    wx.cloud.callFunction({
+      name: 'mapService',
+      data: {
+        action: 'updateDescription',
+        mapId: currentMapId,
+        description: newDescription
+      }
+    }).then(res => {
+      if (res.result.success) {
+        // 更新成功后，更新本地数据和UI
+        this.setData({
+          currentDescription: newDescription,
+          showDescriptionModal: false
+        });
+        wx.showToast({
+          title: '更新成功',
+          icon: 'success'
+        });
+      } else {
+        // 这里的错误会被捕获并显示 '云端更新失败'
+        // 现在云函数会返回 'No matching record found...' 如果 document 不存在
+        throw new Error(res.result.errMsg || '云端更新失败');
+      }
+    }).catch(err => {
+      wx.showToast({
+        title: '更新失败',
+        icon: 'none'
+      });
+      console.error('调用 updateDescription 云函数失败', err);
+    });
+  },
+  
+  // --- 用户信息相关逻辑保持不变 ---
+
+  async _loadUserInfo() {
+    // 1. 本地缓存
+    const local = wx.getStorageSync('userInfo');
+    if (local && Object.keys(local).length > 0) {
+      this.setData({ userInfo: local });
+      app.setGlobalData && app.setGlobalData('userInfo', local);
+      return;
+    }
+
+    // 2. 云数据库
+    try {
+      const res = await wx.cloud.callFunction({
+        name: 'getUserInfo',
+      });
+
+      if (res && res.result && res.result.data) {
+        const cloudInfo = res.result.data;
+        this.setData({ userInfo: cloudInfo });
+        wx.setStorageSync('userInfo', cloudInfo);
+        app.setGlobalData && app.setGlobalData('userInfo', cloudInfo);
+      } else {
+        this._initUserInfo();
+      }
+
+    } catch (err) {
+      console.error("❌ 获取云端用户信息失败", err);
+    }
+  },
+
+  _initUserInfo() {
+    const initData = {
+      avatarUrl: '',
+      nickName: '',
+      createdAt: Date.now(),
+    };
+
+    this.setData({ userInfo: initData });
+    wx.setStorageSync('userInfo', initData);
+    app.setGlobalData && app.setGlobalData('userInfo', initData);
+  },
 
   async chooseAvatar(e) {
     const tempPath = e.detail.avatarUrl;
-
-    // ① 上传到云存储
     const cloudUrl = await this._uploadAvatar(tempPath);
-
-    // ② 存储 fileID
     this._updateUserInfo({ avatarUrl: cloudUrl });
   },
 
   inputNickName(e) {
-    console.log(e)
     const nickName = e.detail.value.trim();
     this._updateUserInfo({ nickName });
   },
@@ -349,51 +434,31 @@ Page({
         cloudPath,
         filePath: tempPath
       });
-
-      console.log("☁ 上传成功 fileID:", res.fileID);
       return res.fileID;
-
     } catch (err) {
       console.error("❌ 上传失败，使用临时路径：", err);
       return tempPath; 
     }
   },
-  /**
-   * 核心统一处理用户信息更新
-   * 1. 更新 UI
-   * 2. 存本地缓存
-   * 3. 同步到全局
-   * 4. 自动节流后同步到云服务
-   */
+  
   _updateUserInfo(changes) {
     const userInfo = { ...this.data.userInfo, ...changes };
-
-    // 更新 UI
     this.setData({ userInfo });
-
-    // 本地缓存
     wx.setStorageSync('userInfo', userInfo);
-
-    // 全局缓存
     app.setGlobalData && app.setGlobalData('userInfo', userInfo);
 
-    // 600ms 节流后更新云端
     if (updateTimer) clearTimeout(updateTimer);
     updateTimer = setTimeout(() => {
       this._syncUserInfoToCloud(userInfo);
     }, 600);
   },
 
-   /**
-   * 真正更新到云数据库
-   */
   async _syncUserInfoToCloud(userInfo) {
     try {
       await wx.cloud.callFunction({
         name: 'updateUserInfo',
         data: { userInfo }
       });
-      console.log('☁ 用户信息已同步到云', userInfo);
     } catch (err) {
       console.error('❌ 同步失败：', err);
     }
@@ -423,7 +488,7 @@ Page({
 
   // 退出登录
   logout() {
-    // wx.removeStorageSync('userInfo');
+    // 退出逻辑
   },
 
   goListPage(){

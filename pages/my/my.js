@@ -23,36 +23,52 @@ Page({
   },
 
   async onShow() {
-
     await this._loadUserInfo();
     const maps = this.data.userInfo.maps;
-    const currentMapId = wx.getStorageSync('currentMapId') || maps[this.data.currentMapIndex].id;
+    const currentMapId = wx.getStorageSync('currentMapId') || (maps.length > 0 ? maps[this.data.currentMapIndex].id : null);
     
+    if (!currentMapId || maps.length === 0) {
+      if (maps.length === 0) {
+        // 如果用户没有任何地图，可以考虑初始化一个默认地图
+        const defaultMap = { name: '足迹1', id: 'map1' };
+        this._initUserInfo(defaultMap); 
+        this.setData({
+          maps: [defaultMap],
+          currentMapName: defaultMap.name,
+        });
+        wx.setStorageSync('currentMapId', defaultMap.id);
+        
+        await this._ensureMapData(defaultMap.id);
+        await this.getVisitedCities(defaultMap.id);
+      }
+      return;
+    }
+
     const currentIndex = maps.findIndex(item => item.id === currentMapId);
+    const initialIndex = currentIndex > -1 ? currentIndex : 0;
     
     this.setData({
       maps,
-      currentMapIndex: currentIndex > -1 ? currentIndex : 0,
-      currentMapName: maps[currentIndex > -1 ? currentIndex : 0].name,
+      currentMapIndex: initialIndex,
+      currentMapName: maps[initialIndex].name,
     });
     
-    // 核心修改：使用 await 等待当前地图的数据在云端被创建，确保后续操作有文档可读写
     wx.showLoading({ title: '加载数据中', mask: true });
     try {
+        // 1. 确保数据存在 (调用 mapService/ensureMapData)
         await this._ensureMapData(currentMapId);
-        // 数据创建或确保存在后，再获取和展示数据
-        this.getVisitedCities(currentMapId);
+        // 2. 获取和展示数据 (调用云函数)
+        await this.getVisitedCities(currentMapId);
     } catch (e) {
         console.error('初始化数据失败:', e);
-        wx.showToast({ title: '初始化失败', icon: 'none' });
+        wx.showToast({ title: '初始化/加载失败', icon: 'none' });
     } finally {
         wx.hideLoading();
     }
   },
     
   /**
-   * 确保足迹数据在云端有记录 (现在返回 Promise，可 await)
-   * @param {string} mapId - 当前地图 ID
+   * 确保足迹数据在云端有记录 (调用 mapService/ensureMapData)
    */
   _ensureMapData(mapId) {
     return wx.cloud.callFunction({
@@ -68,32 +84,52 @@ Page({
       return res;
     }).catch(err => {
       console.error(`调用 ensureMapData 失败 for ${mapId}`, err);
-      // 抛出错误，以便 onShow 可以捕获
       throw err;
     });
   },
 
-  // 从云数据库获取已访问城市数据和文案
-  getVisitedCities(mapId) {
-    const db = wx.cloud.database();
-    db.collection('visitedCities').where({
-      mapId: mapId
-    }).get({
-      success: res => {
-        const data = res.data[0];
-        const visitedCities = data ? data.cities : {};
-        // 提取 description，提供一个友好的默认值
-        const description = data && data.description !== undefined ? data.description : '这是一个新的足迹，还没有任何介绍哦！';
-        
-        this.setData({
-          visitedCities: this._parseVisitedCities(visitedCities),
-          currentDescription: description // 更新当前文案
+  /**
+   * ⚠️ 核心修改：从云数据库获取已访问城市数据和文案，改为分别调用云函数
+   */
+  async getVisitedCities(mapId) {
+    try {
+        // 1. 调用 getVisitedCities 云函数获取已访问城市数据
+        const citiesRes = await wx.cloud.callFunction({
+          name: 'getVisitedCities', // 获取 cities 数据
+          data: { mapId: mapId }
         });
-      },
-      fail: err => {
-        console.error('获取已访问城市失败', err);
-      }
-    });
+        
+        if (!citiesRes.result.success) {
+            throw new Error(citiesRes.result.message || '获取城市数据失败');
+        }
+
+        const visitedCitiesData = citiesRes.result.data; // {城市Key: 城市详情} 的对象
+
+        // 2. 调用 mapService 云函数获取 description 文案
+        const descriptionRes = await wx.cloud.callFunction({
+            name: 'mapService',
+            data: {
+                action: 'getDescription', // 新增的 action
+                mapId: mapId
+            }
+        });
+        
+        if (!descriptionRes.result.success) {
+             throw new Error(descriptionRes.result.message || '获取文案失败');
+        }
+
+        const description = descriptionRes.result.data.description; 
+
+        this.setData({
+          visitedCities: this._parseVisitedCities(visitedCitiesData),
+          currentDescription: description
+        });
+
+    } catch (err) {
+      console.error('❌ 获取地图数据失败 (云函数调用失败)', err);
+      wx.showToast({ title: '加载地图数据失败', icon: 'none' });
+      this.setData({ visitedCities: [], currentDescription: '数据加载失败，请重试。' });
+    }
   },
   
   // 提取已点亮城市
@@ -125,7 +161,7 @@ Page({
     wx.showLoading({ title: '切换中', mask: true });
     this._ensureMapData(currentMapId)
       .then(() => {
-          this.getVisitedCities(currentMapId);
+          this.getVisitedCities(currentMapId); // 调用优化的获取方法
       })
       .catch(e => {
            wx.showToast({ title: '数据加载失败', icon: 'none' });
@@ -159,7 +195,7 @@ Page({
     });
   },
 
-  // 确认创建足迹 (使用云函数)
+  // 确认创建足迹 (调用 mapService/createMap)
   confirmCreateMap() {
     const { newMapName, maps } = this.data;
     
@@ -293,72 +329,75 @@ Page({
       icon: 'success'
     });
   },
-  // my.js (新增)
 
-// 删除足迹地图
-deleteMap(e) {
-  const index = e.currentTarget.dataset.index;
-  const mapToDelete = this.data.maps[index];
+  // 删除足迹地图
+  deleteMap(e) {
+    const index = e.currentTarget.dataset.index;
+    const mapToDelete = this.data.maps[index];
 
-  wx.showModal({
-    title: '删除确认',
-    content: `确定要删除足迹地图：${mapToDelete.name} 吗？\n所有点亮城市记录也将被删除！`,
-    confirmText: '删除',
-    confirmColor: '#FF4D4F',
-    success: async (res) => {
-      if (res.confirm) {
-        try {
-          // 1. 调用云函数删除地图数据
-          await wx.cloud.callFunction({
-            name: 'mapOperations',
-            data: {
-              action: 'deleteMap',
-              mapId: mapToDelete.id
+    wx.showModal({
+      title: '删除确认',
+      content: `确定要删除足迹地图：${mapToDelete.name} 吗？\n所有点亮城市记录也将被删除！`,
+      confirmText: '删除',
+      confirmColor: '#FF4D4F',
+      success: async (res) => {
+        if (res.confirm) {
+          try {
+            // 1. 调用云函数删除地图数据 (假设 mapOperations 提供了 deleteMap)
+            // ⚠️ 确保 mapOperations/deleteMap 云函数也做了 OPENID 隔离
+            await wx.cloud.callFunction({
+              name: 'mapOperations',
+              data: {
+                action: 'deleteMap',
+                mapId: mapToDelete.id
+              }
+            });
+
+            // 2. 更新本地数据
+            const newMaps = this.data.maps.filter((_, i) => i !== index);
+            console.log(newMaps)
+            let newCurrentMapId = newMaps.length > 0 ? newMaps[0].id : null;
+            let newCurrentMapIndex = 0;
+            
+            if (mapToDelete.id !== wx.getStorageSync('currentMapId') && newMaps.length > 0) {
+              // 如果删除的不是当前地图，则保持当前地图不变
+              // newCurrentMapId = wx.getStorageSync('currentMapId');
+              // newCurrentMapIndex = newMaps.findIndex(map => map.id === newCurrentMapId);
+              // newCurrentMapIndex = newCurrentMapIndex > -1 ? newCurrentMapIndex : 0;
+            } else if (newMaps.length > 0) {
+              // 如果删除的是当前地图，切换到新列表的第一个
+              newCurrentMapId = newMaps[0].id;
+              newCurrentMapIndex = 0;
             }
-          });
 
-          // 2. 更新本地数据
-          const newMaps = this.data.maps.filter((_, i) => i !== index);
-          
-          let newCurrentMapIndex = 0;
-          let newCurrentMapId = newMaps[0] ? newMaps[0].id : '';
-          
-          if (mapToDelete.id === wx.getStorageSync('currentMapId')) {
-             // 如果删除的是当前地图，则切换到第一个地图
-             newCurrentMapId = newMaps[0].id;
-          } else {
-             // 否则保持当前地图不变，重新计算索引
-             newCurrentMapId = wx.getStorageSync('currentMapId');
-             newCurrentMapIndex = newMaps.findIndex(map => map.id === newCurrentMapId);
+
+            this.setData({
+              maps: newMaps,
+              currentMapIndex: newCurrentMapIndex,
+              currentMapName: newMaps.length > 0 ? newMaps[newCurrentMapIndex].name : '我的足迹'
+            });
+
+            this._updateUserInfo({ maps: newMaps, });
+
+            if (newMaps.length > 0) {
+              wx.setStorageSync('currentMapId', newCurrentMapId);
+              this.getVisitedCities(newCurrentMapId); // 重新加载新地图的数据
+            } else {
+              // 全部删光，设置空状态
+              wx.removeStorageSync('currentMapId');
+              this.setData({ visitedCities: [], currentDescription: '快来创建一个新的足迹吧！' });
+            }
+
+            wx.showToast({ title: '删除成功', icon: 'success' });
+          } catch (error) {
+            console.error('❌ 删除地图失败', error);
+            wx.showToast({ title: '删除失败', icon: 'none' });
           }
-
-
-          this.setData({
-            maps: newMaps,
-            currentMapIndex: newCurrentMapIndex,
-            currentMapName: newMaps[newCurrentMapIndex].name
-          });
-
-          this._updateUserInfo({ maps: newMaps, });
-
-          if (newMaps.length > 0) {
-            wx.setStorageSync('currentMapId', newCurrentMapId);
-            this.getVisitedCities(newCurrentMapId); // 重新加载新地图的数据
-          } else {
-             // 全部删光，设置空状态
-             wx.removeStorageSync('currentMapId');
-             this.setData({ visitedCities: [], currentMapName: '我的足迹' });
-          }
-
-          wx.showToast({ title: '删除成功', icon: 'success' });
-        } catch (error) {
-          console.error('❌ 删除地图失败', error);
-          wx.showToast({ title: '删除失败', icon: 'none' });
         }
       }
-    }
-  });
-},
+    });
+  },
+
   // 显示说明文案编辑弹层
   showDescriptionModal() {
     this.setData({
@@ -382,7 +421,7 @@ deleteMap(e) {
     });
   },
 
-  // 确认更新说明文案 (使用云函数)
+  // 确认更新说明文案 (调用 mapService/updateDescription)
   confirmUpdateDescription() {
     const { currentMapIndex, maps, descriptionInput } = this.data;
     const currentMapId = maps[currentMapIndex].id;
@@ -416,8 +455,6 @@ deleteMap(e) {
           icon: 'success'
         });
       } else {
-        // 这里的错误会被捕获并显示 '云端更新失败'
-        // 现在云函数会返回 'No matching record found...' 如果 document 不存在
         throw new Error(res.result.errMsg || '云端更新失败');
       }
     }).catch(err => {
@@ -454,6 +491,7 @@ deleteMap(e) {
           wx.setStorageSync('userInfo', cloudInfo);
           app.setGlobalData && app.setGlobalData('userInfo', cloudInfo);
         } else {
+          // 初始化默认用户数据
           this._initUserInfo();
         }
         resolve()
@@ -464,13 +502,11 @@ deleteMap(e) {
     })
   },
 
-  _initUserInfo() {
+  _initUserInfo(defaultMap) {
     const initData = {
-      avatarUrl: '',
-      nickName: '',
-      maps: [
-        { name: '足迹1', id: 'map1' }
-      ],
+      avatarUrl: this.data.userInfo.avatarUrl,
+      nickName: this.data.userInfo.nickName,
+      maps: defaultMap ? [defaultMap] : [ { name: '足迹1', id: 'map1' } ],
       createdAt: Date.now(),
     };
 
@@ -520,6 +556,7 @@ deleteMap(e) {
 
   async _syncUserInfoToCloud(userInfo) {
     try {
+      // ⚠️ 确保 updateUserInfo 云函数也实现了 OPENID 隔离
       await wx.cloud.callFunction({
         name: 'updateUserInfo',
         data: { userInfo }

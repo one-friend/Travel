@@ -7,13 +7,17 @@ const db = cloud.database();
 
 exports.main = async (event, context) => {
   const { mapId, cities } = event;
+  const wxContext = cloud.getWXContext(); // 获取用户的 OPENID
 
   try {
-    // 创建新的足迹记录
+    // 创建新的足迹记录，并关联到当前用户的 OPENID
     await db.collection('visitedCities').add({
       data: {
         mapId: mapId,
-        cities: cities || {}  // 默认空对象
+        cities: cities || {},  // 默认空对象
+        description: '这是我的新足迹，欢迎点亮更多城市！',
+        _openid: wxContext.OPENID, // 用户的唯一标识
+        createTime: db.serverDate() // 创建时间
       }
     });
 

@@ -7,7 +7,6 @@ App({
         // 发送 res.code 到后台换取 openId, sessionKey, unionId
       }
     })
-    this._loadUserInfo()
     if (!wx.cloud) {
       console.error('请使用 2.2.3 或以上的基础库以使用云能力')
     } else {
@@ -15,10 +14,15 @@ App({
         env: 'cloud1-6gdihppzc46de958', // 这里填你的云环境 ID
         traceUser: true
       })
+
+      this._loadUserInfo()
     }
   },
   globalData: {
-    userInfo: null
+    userInfo: {
+      avatarUrl: 'https://mmbiz.qpic.cn/mmbiz/icTdbqWNOwNRna42FI242Lcia07jQodd2FJGIYQfG0LAJGFxM4FbnQP6yfMxBgJ0F3YRqJCJ1aPAK2dQagdusBZg/0',
+      nickName: '微信用户'
+    },
   },
   setGlobalData: function(key,data) {
     this.globalData[key] = data;

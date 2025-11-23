@@ -7,11 +7,7 @@ Page({
       nickName: '微信用户'
     },
     visitedCities: [],
-    maps: [
-      { name: '足迹1', id: 'map1' },
-      { name: '足迹2', id: 'map2' },
-      { name: '足迹3', id: 'map3' }
-    ],
+    maps: [],
     currentMapIndex: 0,
     currentMapName: '足迹1',
     showDetailModal: false,
@@ -27,7 +23,9 @@ Page({
   },
 
   async onShow() {
-    const maps = wx.getStorageSync('maps') || this.data.maps;
+
+    await this._loadUserInfo();
+    const maps = this.data.userInfo.maps;
     const currentMapId = wx.getStorageSync('currentMapId') || maps[this.data.currentMapIndex].id;
     
     const currentIndex = maps.findIndex(item => item.id === currentMapId);
@@ -50,9 +48,6 @@ Page({
     } finally {
         wx.hideLoading();
     }
-    
-    // 加载用户信息（与其他数据无强依赖关系，可异步）
-    this._loadUserInfo();
   },
     
   /**
@@ -209,8 +204,7 @@ Page({
           newMapName: ''
         });
 
-        // 保存到本地存储
-        wx.setStorageSync('maps', newMaps);
+        this._updateUserInfo({ maps: newMaps, });
 
         wx.showToast({
           title: '创建成功',
@@ -290,8 +284,7 @@ Page({
       currentMapName: renamingIndex === this.data.currentMapIndex ? name : this.data.currentMapName
     });
 
-    // 保存到本地存储
-    wx.setStorageSync('maps', newMaps);
+    this._updateUserInfo({ maps: newMaps, });
     
     this.closeRenameModal();
     
@@ -300,7 +293,72 @@ Page({
       icon: 'success'
     });
   },
-  
+  // my.js (新增)
+
+// 删除足迹地图
+deleteMap(e) {
+  const index = e.currentTarget.dataset.index;
+  const mapToDelete = this.data.maps[index];
+
+  wx.showModal({
+    title: '删除确认',
+    content: `确定要删除足迹地图：${mapToDelete.name} 吗？\n所有点亮城市记录也将被删除！`,
+    confirmText: '删除',
+    confirmColor: '#FF4D4F',
+    success: async (res) => {
+      if (res.confirm) {
+        try {
+          // 1. 调用云函数删除地图数据
+          await wx.cloud.callFunction({
+            name: 'mapOperations',
+            data: {
+              action: 'deleteMap',
+              mapId: mapToDelete.id
+            }
+          });
+
+          // 2. 更新本地数据
+          const newMaps = this.data.maps.filter((_, i) => i !== index);
+          
+          let newCurrentMapIndex = 0;
+          let newCurrentMapId = newMaps[0] ? newMaps[0].id : '';
+          
+          if (mapToDelete.id === wx.getStorageSync('currentMapId')) {
+             // 如果删除的是当前地图，则切换到第一个地图
+             newCurrentMapId = newMaps[0].id;
+          } else {
+             // 否则保持当前地图不变，重新计算索引
+             newCurrentMapId = wx.getStorageSync('currentMapId');
+             newCurrentMapIndex = newMaps.findIndex(map => map.id === newCurrentMapId);
+          }
+
+
+          this.setData({
+            maps: newMaps,
+            currentMapIndex: newCurrentMapIndex,
+            currentMapName: newMaps[newCurrentMapIndex].name
+          });
+
+          this._updateUserInfo({ maps: newMaps, });
+
+          if (newMaps.length > 0) {
+            wx.setStorageSync('currentMapId', newCurrentMapId);
+            this.getVisitedCities(newCurrentMapId); // 重新加载新地图的数据
+          } else {
+             // 全部删光，设置空状态
+             wx.removeStorageSync('currentMapId');
+             this.setData({ visitedCities: [], currentMapName: '我的足迹' });
+          }
+
+          wx.showToast({ title: '删除成功', icon: 'success' });
+        } catch (error) {
+          console.error('❌ 删除地图失败', error);
+          wx.showToast({ title: '删除失败', icon: 'none' });
+        }
+      }
+    }
+  });
+},
   // 显示说明文案编辑弹层
   showDescriptionModal() {
     this.setData({
@@ -374,38 +432,45 @@ Page({
   // --- 用户信息相关逻辑保持不变 ---
 
   async _loadUserInfo() {
-    // 1. 本地缓存
-    const local = wx.getStorageSync('userInfo');
-    if (local && Object.keys(local).length > 0) {
-      this.setData({ userInfo: local });
-      app.setGlobalData && app.setGlobalData('userInfo', local);
-      return;
-    }
-
-    // 2. 云数据库
-    try {
-      const res = await wx.cloud.callFunction({
-        name: 'getUserInfo',
-      });
-
-      if (res && res.result && res.result.data) {
-        const cloudInfo = res.result.data;
-        this.setData({ userInfo: cloudInfo });
-        wx.setStorageSync('userInfo', cloudInfo);
-        app.setGlobalData && app.setGlobalData('userInfo', cloudInfo);
-      } else {
-        this._initUserInfo();
+    return new Promise(async (resolve, reject) => {
+      // 1. 本地缓存
+      const local = wx.getStorageSync('userInfo');
+      if (local && Object.keys(local).length > 0) {
+        this.setData({ userInfo: local });
+        app.setGlobalData && app.setGlobalData('userInfo', local);
+        resolve()
+        return;
       }
 
-    } catch (err) {
-      console.error("❌ 获取云端用户信息失败", err);
-    }
+      // 2. 云数据库
+      try {
+        const res = await wx.cloud.callFunction({
+          name: 'getUserInfo',
+        });
+
+        if (res && res.result && res.result.data) {
+          const cloudInfo = res.result.data;
+          this.setData({ userInfo: cloudInfo });
+          wx.setStorageSync('userInfo', cloudInfo);
+          app.setGlobalData && app.setGlobalData('userInfo', cloudInfo);
+        } else {
+          this._initUserInfo();
+        }
+        resolve()
+      } catch (err) {
+        console.error("❌ 获取云端用户信息失败", err);
+        resolve()
+      }
+    })
   },
 
   _initUserInfo() {
     const initData = {
       avatarUrl: '',
       nickName: '',
+      maps: [
+        { name: '足迹1', id: 'map1' }
+      ],
       createdAt: Date.now(),
     };
 

@@ -108,12 +108,15 @@ Page({
   // 加载已访问地区数据
   // 从云数据库加载已访问数据
   loadVisitedData: function() {
+    wx.showLoading()
     this.getVisitedCitiesFromCloud().then((visitedCities) => {
       this.initDefaultData(visitedCities);
       // 初始化地图高亮
       this.initMapHighlights(()=>{this.initChart()})
+      wx.hideLoading()
     }).catch(err => {
       console.error('获取已访问城市数据失败', err);
+      wx.hideLoading()
     });
   },
 
@@ -519,7 +522,7 @@ Page({
             chartComponent: this.ecComponent,
             userInfo: {
               nickname: userInfo?.nickName || '微信用户',
-              avatar: userInfo?.avatarUrl  
+              avatar: userInfo?.avatarUrl || 'https://mmbiz.qpic.cn/mmbiz/icTdbqWNOwNRna42FI242Lcia07jQodd2FJGIYQfG0LAJGFxM4FbnQP6yfMxBgJ0F3YRqJCJ1aPAK2dQagdusBZg/0'
             },
             text: {
               title: `我已经点亮了${this.data.visitedCount}个城市`,

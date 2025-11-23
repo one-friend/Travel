@@ -83,7 +83,7 @@ page {
   transition: all 0.3s ease;
   box-shadow: 0 4rpx 10rpx rgba(0, 0, 0, 0.05);
   margin: 0;
-  line-height: 1.4; 
+  line-height: 2.5; 
   height: auto;
 }
 
@@ -157,8 +157,10 @@ page {
   color: #fff !important;
   border: none !important;
   /* 修复新建按钮高度 */
-  line-height: 1.4;
+  line-height: 2.5;
   height: auto;
+  display: flex;
+  align-items: center;
 }
 
 .create-btn:active {

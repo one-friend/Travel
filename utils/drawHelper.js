@@ -17,7 +17,7 @@ export function drawRoundImg(ctx, imgUrl, x, y, size) {
         resolve();
       },
       complete(res){
-        console.log(res)
+        resolve()
       }
     });
   });

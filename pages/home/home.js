@@ -108,15 +108,15 @@ Page({
   // 加载已访问地区数据
   // 从云数据库加载已访问数据
   loadVisitedData: function() {
-    // wx.showLoading()
+    wx.showLoading()
     this.getVisitedCitiesFromCloud().then((visitedCities) => {
       this.initDefaultData(visitedCities);
       // 初始化地图高亮
       this.initMapHighlights(()=>{this.initChart()})
-      // wx.hideLoading()
+      wx.hideLoading()
     }).catch(err => {
       console.error('获取已访问城市数据失败', err);
-      // wx.hideLoading()
+      wx.hideLoading()
     });
   },
 

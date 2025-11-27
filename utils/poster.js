@@ -61,7 +61,7 @@ export function createSharePoster(options) {
       ctx.setTextAlign('left');
       ctx.setTextBaseline('alphabetic');
       ctx.setShadow(0, 0, 0, 'rgba(0, 0, 0, 0)'); // 明确清除阴影
-      ctx.fillText(`这里写点文案`, avatarX + avatarSize + 10, avatarY + 65);
+      ctx.fillText(`已点亮 ${visitedCount} 个城市`, avatarX + avatarSize + 10, avatarY + 65);
 
       // 6. 顶部区域：标题
       const titleH = avatarY + avatarSize + 70
@@ -72,14 +72,13 @@ export function createSharePoster(options) {
       ctx.fillText('山川有迹-脚步有光', avatarX, titleH);
 
       // 7. 副文案
-      drawTextBlock(ctx, '我用脚步丈量世界 ，用心点亮每一座城市',avatarX, titleH + 70, posterWidth / 2, 50, '#FFFFFF', 32)
+      drawTextBlock(ctx, '我用脚步丈量世界 ，用心点亮每一座城市', avatarX, titleH + 70, posterWidth / 2, 50, '#FFFFFF', 32)
 
       // 8. 图表区域：增加边框 + 光影效果
       const chartMaxWidth = posterWidth;
-      const chartMaxHeight = 500;
-      
+      const chartMaxHeight = 600;
       const chartRatio = imageInfo.width / imageInfo.height;
-      let chartWidth = chartMaxWidth;
+      let chartWidth = chartMaxWidth * 1.2;
       let chartHeight = chartWidth / chartRatio;
       
       if (chartHeight > chartMaxHeight) {
@@ -88,7 +87,7 @@ export function createSharePoster(options) {
       }
 
       const chartX = (posterWidth - chartWidth) / 2;
-      const chartY = titleH + 100;
+      const chartY = titleH + 60;
 
       // 绘制图表背景：精致边框 + 投影效果
       // ctx.setFillStyle('#F7F7F7');  // 浅色背景
@@ -97,13 +96,12 @@ export function createSharePoster(options) {
       // ctx.setShadow(5, 5, 15, 'rgba(0, 0, 0, 0.2)'); // 添加阴影效果
       // ctx.fillRect(chartX - 15, chartY - 15, chartWidth + 30, chartHeight + 30); // 绘制阴影边框
       // ctx.setShadow(0, 0, 0, 'rgba(0, 0, 0, 0)'); // 清除阴影
-
       // 绘制图表
       ctx.drawImage(chartImage, chartX, chartY, chartWidth, chartHeight);
 
-      // 9. 底部文案
-      const bottomY = chartY + chartHeight + 10;
-      drawTextBlock(ctx, '已点亮 '+visitedCount+' 个城市 ， 色彩正在继续',avatarX, bottomY, posterWidth , 50, '#FFFFFF', 32);
+      // // 9. 底部文案
+      // const bottomY = chartY + chartHeight + 10;
+      // drawTextBlock(ctx, '已点亮 '+visitedCount+' 个城市 ， 色彩正在继续',avatarX, bottomY, posterWidth , 50, '#FFFFFF', 32);
 
 
       // 10. 添加底部logo：保持简洁
@@ -113,8 +111,8 @@ export function createSharePoster(options) {
       if (logo) {
         await drawRoundImg(ctx, 'cloud://cloud1-6gdihppzc46de958.636c-cloud1-6gdihppzc46de958-1385249519/gh_c084e7dde486_258.jpg', logoX, logoY, logoSize);
       }
-
-      // 10. 绘制并导出
+      drawTextBlock(ctx, 'MapLight',logoX - 2 * logoSize, logoY +  (logoSize/2), posterWidth , 20, '#000000', 20);
+      // 11. 绘制并导出
       ctx.draw(false, () => {
         setTimeout(() => {
           wx.canvasToTempFilePath({

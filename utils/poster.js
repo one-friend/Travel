@@ -1,8 +1,10 @@
 // utils/poster.js
 import { exportEChartImage } from './canvasExport';
 import { drawRoundImg, drawTextBlock } from './drawHelper';
+import { getRandomText } from '../data/poster_text'
 
 export function createSharePoster(options) {
+  const postText = getRandomText();
   return new Promise(async (resolve, reject) => {
     try {
       const { chartComponent, userInfo, visitedCount, text, watermark, logo } = options;
@@ -69,10 +71,10 @@ export function createSharePoster(options) {
       ctx.setFillStyle('#FFFFFF'); // 白色文字
       ctx.setTextAlign('left');
       ctx.font = 'bold 46px "Helvetica Neue", sans-serif';  // 艺术字体
-      ctx.fillText('山川有迹-脚步有光', avatarX, titleH);
+      ctx.fillText(postText.title, avatarX, titleH);
 
       // 7. 副文案
-      drawTextBlock(ctx, '我用脚步丈量世界 ，用心点亮每一座城市', avatarX, titleH + 70, posterWidth / 2, 50, '#FFFFFF', 32)
+      drawTextBlock(ctx, postText.desc, avatarX, titleH + 70, (posterWidth / 2) + 130, 40, '#FFFFFF', 28)
 
       // 8. 图表区域：增加边框 + 光影效果
       const chartMaxWidth = posterWidth;

@@ -28,6 +28,6 @@ export function exportEChartImage(echartsComponent, opts = {}) {
           fail: reject
         });
       }).exec();
-    }, 1000); // 重要：给图表足够时间渲染
+    }, 500); // 重要：给图表足够时间渲染
   });
 }

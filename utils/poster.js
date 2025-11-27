@@ -5,7 +5,7 @@ import { drawRoundImg, drawTextBlock } from './drawHelper';
 export function createSharePoster(options) {
   return new Promise(async (resolve, reject) => {
     try {
-      const { chartComponent, userInfo, text, watermark, logo } = options;
+      const { chartComponent, userInfo, visitedCount, text, watermark, logo } = options;
       // 1. 导出图表
       const chartImage = await exportEChartImage(chartComponent);
       
@@ -103,7 +103,7 @@ export function createSharePoster(options) {
 
       // 9. 底部文案
       const bottomY = chartY + chartHeight + 10;
-      drawTextBlock(ctx, '已点亮 4 个城市 ， 色彩正在继续',avatarX, bottomY, posterWidth , 50, '#FFFFFF', 32);
+      drawTextBlock(ctx, '已点亮 '+visitedCount+' 个城市 ， 色彩正在继续',avatarX, bottomY, posterWidth , 50, '#FFFFFF', 32);
 
 
       // 10. 添加底部logo：保持简洁

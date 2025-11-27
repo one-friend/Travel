@@ -42,6 +42,7 @@ const citiesByProvince = [
       { name: '沧州', visited: false },
       { name: '廊坊', visited: false },
       { name: '衡水', visited: false },
+      { name: '雄安', visited: false},
     ],
   },
   {
@@ -93,7 +94,7 @@ const citiesByProvince = [
       { name: '白山', visited: false },
       { name: '松原', visited: false },
       { name: '白城', visited: false },
-      { name: '延边朝鲜族自治州', visited: false },
+      { name: '延边', visited: false },
     ],
   },
   {
@@ -102,22 +103,24 @@ const citiesByProvince = [
     cities: [
       { name: '哈尔滨', visited: false },
       { name: '齐齐哈尔', visited: false },
-      { name: '牡丹江', visited: false },
-      { name: '佳木斯', visited: false },
-      { name: '大庆', visited: false },
-      { name: '伊春', visited: false },
       { name: '鸡西', visited: false },
       { name: '鹤岗', visited: false },
       { name: '双鸭山', visited: false },
+      { name: '大庆', visited: false },
+      { name: '伊春', visited: false },
+      { name: '牡丹江', visited: false },
+      { name: '佳木斯', visited: false },
       { name: '七台河', visited: false },
+      { name: '牡丹江', visited: false },
       { name: '黑河', visited: false },
       { name: '绥化', visited: false },
-      { name: '大兴安岭地区', visited: false },
+      { name: '大兴安岭', visited: false },
     ],
   },
   {
     province: '江苏省',
     provinceCode: '320000',
+    // 南京 无锡 徐州 常州 苏州 南通 连云港 淮安 盐城 扬州 镇江 泰州 宿迁
     cities: [
       { name: '南京', visited: false },
       { name: '无锡', visited: false },
@@ -137,6 +140,7 @@ const citiesByProvince = [
   {
     province: '浙江省',
     provinceCode: '330000',
+    // 杭州 宁波 温州 嘉兴 湖州 绍兴 金华 衢州 舟山 台州 丽水
     cities: [
       { name: '杭州', visited: false },
       { name: '宁波', visited: false },
@@ -154,6 +158,7 @@ const citiesByProvince = [
   {
     province: '安徽省',
     provinceCode: '340000',
+    // 合肥 芜湖 蚌埠 淮南 马鞍山 淮北 铜陵 安庆 黄山 滁州 阜阳 宿州 六安 亳州 池州 宣城
     cities: [
       { name: '合肥', visited: false },
       { name: '芜湖', visited: false },
@@ -176,6 +181,7 @@ const citiesByProvince = [
   {
     province: '福建省',
     provinceCode: '350000',
+    // 福州 厦门 莆田 三明 泉州 漳州 南平 龙岩 宁德
     cities: [
       { name: '福州', visited: false },
       { name: '厦门', visited: false },
@@ -191,6 +197,7 @@ const citiesByProvince = [
   {
     province: '江西省',
     provinceCode: '360000',
+    // 南昌 景德镇 萍乡 九江 新余 鹰潭 赣州 吉安 宜春 抚州 上饶
     cities: [
       { name: '南昌', visited: false },
       { name: '景德镇', visited: false },
@@ -208,6 +215,7 @@ const citiesByProvince = [
   {
     province: '山东省',
     provinceCode: '370000',
+    // 济南 青岛 淄博 枣庄 东营 烟台 潍坊 济宁 泰安 威海 日照 临沂 德州 聊城 滨州 菏泽
     cities: [
       { name: '济南', visited: false },
       { name: '青岛', visited: false },
@@ -230,6 +238,7 @@ const citiesByProvince = [
   {
     province: '河南省',
     provinceCode: '410000',
+    // 郑州 开封 洛阳 平顶山 安阳 鹤壁 新乡 焦作 濮阳 许昌 漯河 三门峡 南阳 商丘 信阳 周口 驻马店 济源
     cities: [
       { name: '郑州', visited: false },
       { name: '开封', visited: false },
@@ -254,6 +263,7 @@ const citiesByProvince = [
   {
     province: '湖北省',
     provinceCode: '420000',
+    // 武汉 黄石 十堰 宜昌 襄阳 鄂州 荆门 孝感 荆州 黄冈 咸宁 随州 恩施 仙桃 潜江 天门 神农架
     cities: [
       { name: '武汉', visited: false },
       { name: '黄石', visited: false },
@@ -267,16 +277,17 @@ const citiesByProvince = [
       { name: '黄冈', visited: false },
       { name: '咸宁', visited: false },
       { name: '随州', visited: false },
-      { name: '恩施土家族苗族自治州', visited: false },
+      { name: '恩施', visited: false },
       { name: '仙桃', visited: false },
       { name: '潜江', visited: false },
       { name: '天门', visited: false },
-      { name: '神农架林区', visited: false },
+      { name: '神农架', visited: false },
     ],
   },
   {
     province: '湖南省',
     provinceCode: '430000',
+    // 长沙 株洲 湘潭 衡阳 邵阳 岳阳 常德 张家界 益阳 郴州 永州 怀化 娄底 湘西
     cities: [
       { name: '长沙', visited: false },
       { name: '株洲', visited: false },
@@ -291,23 +302,24 @@ const citiesByProvince = [
       { name: '永州', visited: false },
       { name: '怀化', visited: false },
       { name: '娄底', visited: false },
-      { name: '湘西土家族苗族自治州', visited: false },
+      { name: '湘西', visited: false },
     ],
   },
   {
     province: '广东省',
     provinceCode: '440000',
+    // 广州 韶关 深圳 珠海 汕头 佛山 江门 湛江 茂名 肇庆 惠州 梅州 汕尾 河源 阳江 清远 东莞 中山 潮州 揭阳 云浮
     cities: [
       { name: '广州', visited: false },
+      { name: '韶关', visited: false },
       { name: '深圳', visited: false },
       { name: '珠海', visited: false },
       { name: '汕头', visited: false },
       { name: '佛山', visited: false },
-      { name: '韶关', visited: false },
-      { name: '湛江', visited: false },
-      { name: '肇庆', visited: false },
       { name: '江门', visited: false },
+      { name: '湛江', visited: false },
       { name: '茂名', visited: false },
+      { name: '肇庆', visited: false },
       { name: '惠州', visited: false },
       { name: '梅州', visited: false },
       { name: '汕尾', visited: false },
@@ -324,31 +336,33 @@ const citiesByProvince = [
   {
     province: '海南省',
     provinceCode: '460000',
+    // 海口 三亚 三沙 儋州 五指山 琼海 文昌 万宁 东方 定安 屯昌 澄迈 临高 白沙 昌江 乐东 陵水 保亭 琼中
     cities: [
       { name: '海口', visited: false },
       { name: '三亚', visited: false },
       { name: '三沙', visited: false },
       { name: '儋州', visited: false },
+      { name: '五指山', visited: false },
       { name: '琼海', visited: false },
       { name: '文昌', visited: false },
       { name: '万宁', visited: false },
       { name: '东方', visited: false },
-      { name: '五指山', visited: false },
-      { name: '定安县', visited: false },
-      { name: '屯昌县', visited: false },
-      { name: '澄迈县', visited: false },
-      { name: '临高县', visited: false },
-      { name: '白沙黎族自治县', visited: false },
-      { name: '昌江黎族自治县', visited: false },
-      { name: '乐东黎族自治县', visited: false },
-      { name: '陵水黎族自治县', visited: false },
-      { name: '保亭黎族苗族自治县', visited: false },
-      { name: '琼中黎族苗族自治县', visited: false },
+      { name: '定安', visited: false },
+      { name: '屯昌', visited: false },
+      { name: '澄迈', visited: false },
+      { name: '临高', visited: false },
+      { name: '白沙', visited: false },
+      { name: '昌江', visited: false },
+      { name: '乐东', visited: false },
+      { name: '陵水', visited: false },
+      { name: '保亭', visited: false },
+      { name: '琼中', visited: false },
     ],
   },
   {
     province: '四川省',
     provinceCode: '510000',
+    // 成都 自贡 攀枝花 泸州 德阳 绵阳 广元 遂宁 内江 乐山 南充 眉山 宜宾 广安 达州 雅安 巴中 资阳 阿坝 甘孜 凉山
     cities: [
       { name: '成都', visited: false },
       { name: '自贡', visited: false },
@@ -368,14 +382,15 @@ const citiesByProvince = [
       { name: '雅安', visited: false },
       { name: '巴中', visited: false },
       { name: '资阳', visited: false },
-      { name: '阿坝藏族羌族自治州', visited: false },
-      { name: '甘孜藏族自治州', visited: false },
-      { name: '凉山彝族自治州', visited: false },
+      { name: '阿坝', visited: false },
+      { name: '甘孜', visited: false },
+      { name: '凉山', visited: false },
     ],
   },
   {
     province: '贵州省',
     provinceCode: '520000',
+    // 贵阳 六盘水 遵义 安顺 毕节 铜仁 黔西南 黔东南 黔南
     cities: [
       { name: '贵阳', visited: false },
       { name: '六盘水', visited: false },
@@ -383,14 +398,15 @@ const citiesByProvince = [
       { name: '安顺', visited: false },
       { name: '毕节', visited: false },
       { name: '铜仁', visited: false },
-      { name: '黔西南布依族苗族自治州', visited: false },
-      { name: '黔东南苗族侗族自治州', visited: false },
-      { name: '黔南布依族苗族自治州', visited: false },
+      { name: '黔西南', visited: false },
+      { name: '黔东南', visited: false },
+      { name: '黔南', visited: false },
     ],
   },
   {
     province: '云南省',
     provinceCode: '530000',
+    // 昆明 曲靖 玉溪 保山 昭通 丽江 普洱 临沧 楚雄 红河 文山 西双版纳 大理 德宏 怒江 迪庆
     cities: [
       { name: '昆明', visited: false },
       { name: '曲靖', visited: false },
@@ -400,19 +416,20 @@ const citiesByProvince = [
       { name: '丽江', visited: false },
       { name: '普洱', visited: false },
       { name: '临沧', visited: false },
-      { name: '楚雄彝族自治州', visited: false },
-      { name: '红河哈尼族彝族自治州', visited: false },
-      { name: '文山壮族苗族自治州', visited: false },
-      { name: '西双版纳傣族自治州', visited: false },
-      { name: '大理白族自治州', visited: false },
-      { name: '德宏傣族景颇族自治州', visited: false },
-      { name: '怒江傈僳族自治州', visited: false },
-      { name: '迪庆藏族自治州', visited: false },
+      { name: '楚雄', visited: false },
+      { name: '红河', visited: false },
+      { name: '文山', visited: false },
+      { name: '西双版纳', visited: false },
+      { name: '大理', visited: false },
+      { name: '德宏', visited: false },
+      { name: '怒江', visited: false },
+      { name: '迪庆', visited: false },
     ],
   },
   {
     province: '陕西省',
     provinceCode: '610000',
+    // 西安 铜川 宝鸡 咸阳 渭南 延安 汉中 榆林 安康 商洛
     cities: [
       { name: '西安', visited: false },
       { name: '铜川', visited: false },
@@ -429,6 +446,7 @@ const citiesByProvince = [
   {
     province: '甘肃省',
     provinceCode: '620000',
+    // 兰州 嘉峪关 金昌 白银 天水 武威 张掖 平凉 酒泉 庆阳 定西 陇南 临夏 甘南
     cities: [
       { name: '兰州', visited: false },
       { name: '嘉峪关', visited: false },
@@ -442,27 +460,29 @@ const citiesByProvince = [
       { name: '庆阳', visited: false },
       { name: '定西', visited: false },
       { name: '陇南', visited: false },
-      { name: '临夏回族自治州', visited: false },
-      { name: '甘南藏族自治州', visited: false },
+      { name: '临夏', visited: false },
+      { name: '甘南', visited: false },
     ],
   },
   {
     province: '青海省',
     provinceCode: '630000',
+    // 西宁 海东 海北 黄南 海南 果洛 玉树 海西
     cities: [
       { name: '西宁', visited: false },
       { name: '海东', visited: false },
-      { name: '海北藏族自治州', visited: false },
-      { name: '黄南藏族自治州', visited: false },
-      { name: '海南藏族自治州', visited: false },
-      { name: '果洛藏族自治州', visited: false },
-      { name: '玉树藏族自治州', visited: false },
-      { name: '海西蒙古族藏族自治州', visited: false },
+      { name: '海北', visited: false },
+      { name: '黄南', visited: false },
+      { name: '海南', visited: false },
+      { name: '果洛', visited: false },
+      { name: '玉树', visited: false },
+      { name: '海西', visited: false },
     ],
   },
   {
     province: '内蒙古自治区',
     provinceCode: '150000',
+    // 呼和浩特 包头 乌海 赤峰 通辽 鄂尔多斯 呼伦贝尔 巴彦淖尔 乌兰察布 兴安 锡林郭勒 阿拉善
     cities: [
       { name: '呼和浩特', visited: false },
       { name: '包头', visited: false },
@@ -473,14 +493,15 @@ const citiesByProvince = [
       { name: '呼伦贝尔', visited: false },
       { name: '巴彦淖尔', visited: false },
       { name: '乌兰察布', visited: false },
-      { name: '兴安盟', visited: false },
-      { name: '锡林郭勒盟', visited: false },
-      { name: '阿拉善盟', visited: false },
+      { name: '兴安', visited: false },
+      { name: '锡林郭勒', visited: false },
+      { name: '阿拉善', visited: false },
     ],
   },
   {
     province: '广西壮族自治区',
     provinceCode: '450000',
+    // 南宁 柳州 桂林 梧州 北海 防城港 钦州 贵港 玉林 百色 贺州 河池 来宾 崇左
     cities: [
       { name: '南宁', visited: false },
       { name: '柳州', visited: false },
@@ -501,6 +522,7 @@ const citiesByProvince = [
   {
     province: '西藏自治区',
     provinceCode: '540000',
+    // 拉萨 日喀则 昌都 林芝 山南 那曲 阿里
     cities: [
       { name: '拉萨', visited: false },
       { name: '日喀则', visited: false },
@@ -514,6 +536,7 @@ const citiesByProvince = [
   {
     province: '宁夏回族自治区',
     provinceCode: '640000',
+    // 银川 石嘴山 吴忠 固原 中卫
     cities: [
       { name: '银川', visited: false },
       { name: '石嘴山', visited: false },
@@ -525,21 +548,34 @@ const citiesByProvince = [
   {
     province: '新疆维吾尔自治区',
     provinceCode: '650000',
+    // 乌鲁木齐 克拉玛依 吐鲁番 哈密 昌吉 博州 巴州 阿克苏 克州 喀什 和田 伊犁 塔城 阿勒泰 石河子 阿拉尔 图木舒克 五家渠 北屯 铁门关 双河 可克达拉 昆玉 胡杨河 新星 白杨
     cities: [
       { name: '乌鲁木齐', visited: false },
       { name: '克拉玛依', visited: false },
       { name: '吐鲁番', visited: false },
       { name: '哈密', visited: false },
-      { name: '昌吉回族自治州', visited: false },
-      { name: '博尔塔拉蒙古自治州', visited: false },
-      { name: '巴音郭楞蒙古自治州', visited: false },
+      { name: '昌吉', visited: false },
+      { name: '博州', visited: false },
+      { name: '巴州', visited: false },
       { name: '阿克苏', visited: false },
-      { name: '克孜勒苏柯尔克孜自治州', visited: false },
+      { name: '克州', visited: false },
       { name: '喀什', visited: false },
       { name: '和田', visited: false },
-      { name: '伊犁哈萨克自治州', visited: false },
+      { name: '伊犁', visited: false },
       { name: '塔城', visited: false },
       { name: '阿勒泰', visited: false },
+      { name: '石河子', visited: false },
+      { name: '阿拉尔', visited: false},
+      { name: '图木舒克', visited: false},
+      { name: '五家渠', visited: false},
+      { name: '北屯 ', visited: false},
+      { name: '铁门关', visited: false},
+      { name: '双河', visited: false},
+      { name: '可克达拉', visited: false},
+      { name: '昆玉 ', visited: false},
+      { name: '胡杨河', visited: false},
+      { name: '新星 ', visited: false},
+      { name: '白杨', visited: false},
     ],
   },
   {

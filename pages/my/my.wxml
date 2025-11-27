@@ -22,7 +22,7 @@
         </button>
       </view>
     </view>
-    <button class="map-btn create-btn" bindtap="showCreateModal">+ 新建</button>
+    <button class="map-btn create-btn" style="height: 96rpx;position: relative; top: 10px;" bindtap="showCreateModal">+ 新建</button>
   </view>
 
   <view class="section">
@@ -35,16 +35,16 @@
       <block wx:for="{{visitedCities}}" wx:key="index">
         <view class="city-item" bindtap="showCityDetail" data-city="{{item}}">
           <text class="city-name">{{item.name}}</text>
-          <text class="city-time">{{item.date || item.datetime}}</text>
+          <!-- <text class="city-time">{{item.date || item.datetime}}</text>x -->
         </view>
       </block>
       <view wx:if="{{visitedCities.length === 0}}" class="empty-tip">还没有点亮任何城市哦～ <span class="empty-tip go_light" bind:tap="goListPage">去点亮</span></view>
     </view>
   </view>
 
-  <view class="logout-section">
+  <!-- <view class="logout-section">
     <button class="logout-button" bindtap="logout">退出登录</button>
-  </view>
+  </view> -->
 
   <view wx:if="{{showDetailModal}}" class="popup-mask" bindtap="closePopup">
     <view class="popup" catchtap="stopTap">

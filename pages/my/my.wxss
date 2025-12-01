@@ -353,6 +353,7 @@ page {
 }
 
 .popup-field textarea {
+  box-sizing: border-box;
   width: 100%;
   min-height: 120rpx;
   background: #f8faff;

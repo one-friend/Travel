@@ -597,5 +597,17 @@ Page({
     wx.navigateTo({
       url: '/pages/cityList/cityList'
     })
+  },
+
+  onShareAppMessage(){
+    return {
+      title:`我已经点亮${this.data.visitedCities.length}城市, 和我一起来探索世界吧～`
+    }
+  },
+
+  onShareTimeline() {
+    return {
+      title:`我已经点亮${this.data.visitedCities.length}城市, 和我一起来探索世界吧～`
+    }
   }
 });

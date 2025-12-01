@@ -59,7 +59,7 @@ export function createSharePoster(options) {
       // 完全重置第二段文字的所有样式
       ctx.setFillStyle('#BDC3C7');
       ctx.setFontSize(22);
-      ctx.font = 'normal 22px sans-serif';
+      ctx.font = 'normal 22px serif';
       ctx.setTextAlign('left');
       ctx.setTextBaseline('alphabetic');
       ctx.setShadow(0, 0, 0, 'rgba(0, 0, 0, 0)'); // 明确清除阴影
@@ -113,7 +113,7 @@ export function createSharePoster(options) {
       if (logo) {
         await drawRoundImg(ctx, 'cloud://cloud1-6gdihppzc46de958.636c-cloud1-6gdihppzc46de958-1385249519/gh_c084e7dde486_258.jpg', logoX, logoY, logoSize);
       }
-      drawTextBlock(ctx, 'MapLight',logoX - 2 * logoSize, logoY +  (logoSize/2), posterWidth , 20, '#000000', 20);
+      // drawTextBlock(ctx, 'MapLight',logoX - 2 * logoSize, logoY +  (logoSize/2), posterWidth , 20, '#000000', 20);
       // 11. 绘制并导出
       ctx.draw(false, () => {
         setTimeout(() => {
